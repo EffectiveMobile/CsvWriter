@@ -1,4 +1,4 @@
-package org.writer.model;
+package org.writer.model.fortest;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,9 +11,12 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @CsvClass
-public class Student {
+public class SimpleObjectPrimitArrayCollect {
 
     private String name;
 
-    private List<String> score;
+    private int[] age;
+
+    private List<String> list;
+
 }

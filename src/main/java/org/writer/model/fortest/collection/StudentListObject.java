@@ -1,8 +1,9 @@
-package org.writer.model;
+package org.writer.model.fortest.collection;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import org.writer.model.fortest.SimpleObjectWithString;
 import org.writer.myutils.annotations.CsvClass;
 
 import java.util.List;
@@ -11,9 +12,10 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @CsvClass
-public class Student {
+public class StudentListObject {
 
     private String name;
 
-    private List<String> score;
+    private List<SimpleObjectWithString> score;
+
 }

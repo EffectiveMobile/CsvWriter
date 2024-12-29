@@ -1,19 +1,18 @@
-package org.writer.model;
+package org.writer.model.fortest.array;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import org.writer.myutils.annotations.CsvClass;
 
-import java.util.List;
-
 @Data
 @Builder
 @AllArgsConstructor
 @CsvClass
-public class Student {
+public class StudentArrayPrimitive {
 
     private String name;
 
-    private List<String> score;
+    private int[] arrayPrimitive;
+
 }
