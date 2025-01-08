@@ -38,7 +38,7 @@ public class Main {
         }
 
         Writable csvWriter = new CsvWriter();
-        csvWriter.writeToFile(people, "out/people.csv");
-        csvWriter.writeToFile(students, "out/students.csv");
-}
+        csvWriter.writeToFile(people, "out/people");
+        csvWriter.writeToFile(students, "out/students");
+    }
 }
