@@ -12,6 +12,7 @@ public class Main {
     public static void main(String[] args) {
         Faker faker = new Faker();
 
+        // Создаем лист людей
         List<Person> people = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
             Person person = Person.builder()
@@ -24,6 +25,7 @@ public class Main {
             people.add(person);
         }
 
+        // Создаем лист студентов
         List<Student> students = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
             Student student = Student.builder()
@@ -37,6 +39,7 @@ public class Main {
             students.add(student);
         }
 
+        // Записываем листы людей и студентов в out/people.csv и out/students.csv соответственно
         Writable csvWriter = new CsvWriter();
         csvWriter.writeToFile(people, "out/people");
         csvWriter.writeToFile(students, "out/students");
