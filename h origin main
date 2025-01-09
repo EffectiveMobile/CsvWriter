@@ -1,0 +1,311 @@
+[1mdiff --git a/person_file b/person_file[m
+[1mnew file mode 100644[m
+[1mindex 0000000..e69de29[m
+[1mdiff --git a/pom.xml b/pom.xml[m
+[1mindex effc1bd..6fcbc24 100644[m
+[1m--- a/pom.xml[m
+[1m+++ b/pom.xml[m
+[36m@@ -27,6 +27,12 @@[m
+             <version>5.8.1</version>[m
+             <scope>test</scope>[m
+         </dependency>[m
+[32m+[m[32m        <dependency>[m
+[32m+[m[32m            <groupId>com.github.javafaker</groupId>[m
+[32m+[m[32m            <artifactId>javafaker</artifactId>[m
+[32m+[m[32m            <version>1.0.2</version>[m
+[32m+[m[32m        </dependency>[m
+[32m+[m
+     </dependencies>[m
+ [m
+ </project>[m
+\ No newline at end of file[m
+[1mdiff --git a/src/main/java/org/writer/Main.java b/src/main/java/org/writer/Main.java[m
+[1mindex 40e8213..b021d0e 100644[m
+[1m--- a/src/main/java/org/writer/Main.java[m
+[1m+++ b/src/main/java/org/writer/Main.java[m
+[36m@@ -1,7 +1,39 @@[m
+ package org.writer;[m
+ [m
+[32m+[m[32mimport com.github.javafaker.Faker;[m
+[32m+[m[32mimport org.writer.csv.CsvWriterService;[m
+[32m+[m[32mimport org.writer.model.Months;[m
+[32m+[m[32mimport org.writer.model.Person;[m
+[32m+[m[32mimport org.writer.model.Student;[m
+[32m+[m
+[32m+[m[32mimport java.util.Arrays;[m
+[32m+[m[32mimport java.util.List;[m
+[32m+[m
+ public class Main {[m
+     public static void main(String[] args) {[m
+[31m-        System.out.println("Hello world!");[m
+[32m+[m
+[32m+[m[32m        Faker faker = new Faker();[m
+[32m+[m
+[32m+[m[32m        List<Student> students = Arrays.asList([m
+[32m+[m[32m                Student.builder().name(faker.name().fullName()).score(Arrays.asList("5", "4", "3")).build(),[m
+[32m+[m[32m                Student.builder().name(faker.name().fullName()).score(Arrays.asList("3", "4", "5")).build()[m
+[32m+[m[32m        );[m
+[32m+[m
+[32m+[m[32m        List<Person> people = Arrays.asList([m
+[32m+[m[32m                Person.builder().firstName(faker.name().firstName()).lastName(faker.name().lastName())[m
+[32m+[m[32m                        .dayOfBirth(faker.number().numberBetween(1, 28))[m
+[32m+[m[32m                        .monthOfBirth(Months.values()[faker.number().numberBetween(0, 11)])[m
+[32m+[m[32m                        .yearOfBirth(faker.number().numberBetween(1950, 2020)).build(),[m
+[32m+[m[32m                Person.builder().firstName(faker.name().firstName()).lastName(faker.name().lastName())[m
+[32m+[m[32m                        .dayOfBirth(faker.number().numberBetween(1, 28))[m
+[32m+[m[32m                        .monthOfBirth(Months.values()[faker.number().numberBetween(0, 11)])[m
+[32m+[m[32m                        .yearOfBirth(faker.number().numberBetween(1950, 2020)).build()[m
+[32m+[m[32m        );[m
+[32m+[m
+[32m+[m[32m        Writable csvWriter = new CsvWriterService();[m
+[32m+[m[32m        csvWriter.writeToFile(students,"students_file");[m
+[32m+[m[32m        csvWriter.writeToFile(people,"person_file");[m
+     }[m
+[32m+[m
+[32m+[m
+ }[m
+\ No newline at end of file[m
+[1mdiff --git a/src/main/java/org/writer/Writable.java b/src/main/java/org/writer/Writable.java[m
+[1mindex 9f60c45..ef03ada 100644[m
+[1m--- a/src/main/java/org/writer/Writable.java[m
+[1m+++ b/src/main/java/org/writer/Writable.java[m
+[36m@@ -1,9 +1,11 @@[m
+ package org.writer;[m
+ [m
+ import java.util.List;[m
+[31m-[m
+[32m+[m[32m/**[m
+[32m+[m[32m * Интерфейс для записи информации в файл.[m
+[32m+[m[32m */[m
+ public interface Writable {[m
+ [m
+[31m-    void writeToFile(List<?> data, String fileName);[m
+[32m+[m[32m    void writeToFile(List<?> data,String fileName);[m
+ [m
+ }[m
+[1mdiff --git a/src/main/java/org/writer/csv/Csv.java b/src/main/java/org/writer/csv/Csv.java[m
+[1mnew file mode 100644[m
+[1mindex 0000000..b52318b[m
+[1m--- /dev/null[m
+[1m+++ b/src/main/java/org/writer/csv/Csv.java[m
+[36m@@ -0,0 +1,17 @@[m
+[32m+[m[32mpackage org.writer.csv;[m
+[32m+[m
+[32m+[m[32mimport java.lang.annotation.ElementType;[m
+[32m+[m[32mimport java.lang.annotation.Retention;[m
+[32m+[m[32mimport java.lang.annotation.RetentionPolicy;[m
+[32m+[m[32mimport java.lang.annotation.Target;[m
+[32m+[m
+[32m+[m[32m/**[m
+[32m+[m[32m * Аннотация для полей которые мы хотим включить в CSV файл.[m
+[32m+[m[32m */[m
+[32m+[m[32m@Target(ElementType.FIELD)[m
+[32m+[m[32m@Retention(RetentionPolicy.RUNTIME)[m
+[32m+[m[32mpublic @interface Csv {[m
+[32m+[m[32m    String headerName() default "";[m
+[32m+[m[32m    boolean include() default true;[m
+[32m+[m[32m    String format() default "";[m
+[32m+[m[32m}[m
+[1mdiff --git a/src/main/java/org/writer/csv/CsvWriterService.java b/src/main/java/org/writer/csv/CsvWriterService.java[m
+[1mnew file mode 100644[m
+[1mindex 0000000..b7f4660[m
+[1m--- /dev/null[m
+[1m+++ b/src/main/java/org/writer/csv/CsvWriterService.java[m
+[36m@@ -0,0 +1,49 @@[m
+[32m+[m[32mpackage org.writer.csv;[m
+[32m+[m
+[32m+[m[32mimport org.writer.Writable;[m
+[32m+[m
+[32m+[m[32mimport java.io.FileWriter;[m
+[32m+[m[32mimport java.io.IOException;[m
+[32m+[m[32mimport java.lang.reflect.Field;[m
+[32m+[m[32mimport java.util.Arrays;[m
+[32m+[m[32mimport java.util.List;[m
+[32m+[m[32mimport java.util.stream.Collectors;[m
+[32m+[m
+[32m+[m[32m/**[m
+[32m+[m[32m * Класс для записи информации в файл в формате CSV.[m
+[32m+[m[32m */[m
+[32m+[m[32mpublic class CsvWriterService implements Writable {[m
+[32m+[m
+[32m+[m[32m    @Override[m
+[32m+[m[32m    public void writeToFile(List<?> data,String fileName) {[m
+[32m+[m[32m        if (data == null || data.isEmpty()) {[m
+[32m+[m[32m            throw new IllegalArgumentException("Data list cannot be null or empty");[m
+[32m+[m[32m        }[m
+[32m+[m[32m        Field[] fields = data.get(0).getClass().getDeclaredFields();[m
+[32m+[m
+[32m+[m[32m        try (FileWriter writer = new FileWriter(fileName,true)) {[m
+[32m+[m[32m            for (Object item : data) {[m
+[32m+[m[32m                List<String> values = Arrays.stream(fields)[m
+[32m+[m[32m                        .filter(field -> field.isAnnotationPresent(Csv.class) && field.getAnnotation(Csv.class).include())[m
+[32m+[m[32m                        .map(field -> {[m
+[32m+[m[32m                            field.setAccessible(true);[m
+[32m+[m[32m                            try {[m
+[32m+[m[32m                                Object value = field.get(item);[m
+[32m+[m[32m                                if (value instanceof List) {[m
+[32m+[m[32m                                    return ((List<?>) value)[m
+[32m+[m[32m                                            .stream()[m
+[32m+[m[32m                                            .map(Object::toString)[m
+[32m+[m[32m                                            .collect(Collectors.joining(";"));[m
+[32m+[m[32m                                }[m
+[32m+[m[32m                                return value != null ? value.toString() : "";[m
+[32m+[m[32m                            } catch (IllegalAccessException e) {[m
+[32m+[m[32m                                throw new RuntimeException("Error accessing field value", e);[m
+[32m+[m[32m                            }[m
+[32m+[m[32m                        }).toList();[m
+[32m+[m[32m                writer.write(String.join(",", values) + "\n");[m
+[32m+[m[32m            }[m
+[32m+[m[32m        } catch (IOException e) {[m
+[32m+[m[32m            throw new RuntimeException("Error writing CSV file", e);[m
+[32m+[m[32m        }[m
+[32m+[m[32m    }[m
+[32m+[m[32m}[m
+[1mdiff --git a/src/main/java/org/writer/model/Person.java b/src/main/java/org/writer/model/Person.java[m
+[1mindex ba8576b..34063a1 100644[m
+[1m--- a/src/main/java/org/writer/model/Person.java[m
+[1m+++ b/src/main/java/org/writer/model/Person.java[m
+[36m@@ -3,20 +3,26 @@[m [mpackage org.writer.model;[m
+ import lombok.AllArgsConstructor;[m
+ import lombok.Builder;[m
+ import lombok.Data;[m
+[32m+[m[32mimport org.writer.csv.Csv;[m
+ [m
+ @Data[m
+ @Builder[m
+ @AllArgsConstructor[m
+ public class Person {[m
+ [m
+[32m+[m[32m    @Csv(headerName = "First name")[m
+     private String firstName;[m
+ [m
+[32m+[m[32m    @Csv(headerName = "Last name")[m
+     private String lastName;[m
+ [m
+[32m+[m[32m    @Csv(headerName = "Day of birth")[m
+     private int dayOfBirth;[m
+ [m
+[32m+[m[32m    @Csv(headerName = "Month of birth")[m
+     private Months monthOfBirth;[m
+ [m
+[32m+[m[32m    @Csv(headerName = "Year of birth")[m
+     private int yearOfBirth;[m
+ [m
+ }[m
+[1mdiff --git a/src/main/java/org/writer/model/Student.java b/src/main/java/org/writer/model/Student.java[m
+[1mindex 2b549c4..4a9e84a 100644[m
+[1m--- a/src/main/java/org/writer/model/Student.java[m
+[1m+++ b/src/main/java/org/writer/model/Student.java[m
+[36m@@ -3,6 +3,7 @@[m [mpackage org.writer.model;[m
+ import lombok.AllArgsConstructor;[m
+ import lombok.Builder;[m
+ import lombok.Data;[m
+[32m+[m[32mimport org.writer.csv.Csv;[m
+ [m
+ import java.util.List;[m
+ [m
+[36m@@ -11,7 +12,9 @@[m [mimport java.util.List;[m
+ @AllArgsConstructor[m
+ public class Student {[m
+ [m
+[32m+[m[32m    @Csv(headerName = "Name")[m
+     private String name;[m
+ [m
+[32m+[m[32m    @Csv(headerName = "Scores")[m
+     private List<String> score;[m
+ }[m
+\ No newline at end of file[m
+[1mdiff --git a/src/test/java/org/writer/csv/CsvWriterServiceTest.java b/src/test/java/org/writer/csv/CsvWriterServiceTest.java[m
+[1mnew file mode 100644[m
+[1mindex 0000000..79eaae6[m
+[1m--- /dev/null[m
+[1m+++ b/src/test/java/org/writer/csv/CsvWriterServiceTest.java[m
+[36m@@ -0,0 +1,78 @@[m
+[32m+[m[32mpackage org.writer.csv;[m
+[32m+[m
+[32m+[m[32mimport org.junit.jupiter.api.BeforeEach;[m
+[32m+[m[32mimport org.junit.jupiter.api.Test;[m
+[32m+[m[32mimport org.junit.jupiter.api.io.TempDir;[m
+[32m+[m[32mimport org.writer.Writable;[m
+[32m+[m[32mimport org.writer.model.Months;[m
+[32m+[m[32mimport org.writer.model.Person;[m
+[32m+[m[32mimport org.writer.model.Student;[m
+[32m+[m
+[32m+[m[32mimport java.io.ByteArrayOutputStream;[m
+[32m+[m[32mimport java.io.IOException;[m
+[32m+[m[32mimport java.io.PrintStream;[m
+[32m+[m[32mimport java.nio.file.Files;[m
+[32m+[m[32mimport java.nio.file.Path;[m
+[32m+[m[32mimport java.util.Arrays;[m
+[32m+[m[32mimport java.util.List;[m
+[32m+[m
+[32m+[m[32mimport static org.junit.jupiter.api.Assertions.*;[m
+[32m+[m
+[32m+[m[32mclass CsvWriterServiceTest {[m
+[32m+[m[32m    private Writable csvWriter;[m
+[32m+[m[32m    private static final String STUDENTS_FILE = "students_file_test";[m
+[32m+[m[32m    private static final String PERSON_FILE = "person_file_test";[m
+[32m+[m
+[32m+[m[32m    @BeforeEach[m
+[32m+[m[32m    void setUp() {[m
+[32m+[m[32m        csvWriter = new CsvWriterService();[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    @Test[m
+[32m+[m[32m    void writeToCsvStudents_success(@TempDir Path tempDir) throws IOException {[m
+[32m+[m[32m        Path filePath = tempDir.resolve(STUDENTS_FILE);[m
+[32m+[m[32m        List<Student> students = generateStudent();[m
+[32m+[m[32m        csvWriter.writeToFile(students, filePath.toString());[m
+[32m+[m
+[32m+[m[32m        List<String> lines = Files.readAllLines(filePath);[m
+[32m+[m[32m        assertEquals(1, lines.size());[m
+[32m+[m[32m        assertEquals("Dodie Schinner,5;4;3", lines.get(0));[m
+[32m+[m[32m    }[m
+[32m+[m[32m    @Test[m
+[32m+[m[32m    void writeToCsvPersons_success(@TempDir Path tempDir) throws IOException {[m
+[32m+[m[32m        Path filePath = tempDir.resolve(PERSON_FILE);[m
+[32m+[m[32m        List<Person> students = generatePerson();[m
+[32m+[m
+[32m+[m[32m        csvWriter.writeToFile(students, filePath.toString());[m
+[32m+[m
+[32m+[m[32m        List<String> lines = Files.readAllLines(filePath);[m
+[32m+[m[32m        assertEquals(1, lines.size());[m
+[32m+[m[32m        assertEquals("Dodie,Schinner,4,APRIL,2011", lines.get(0));[m
+[32m+[m[32m    }[m
+[32m+[m[32m    @Test[m
+[32m+[m[32m    void writeToCsv_dataEmpty(){[m
+[32m+[m[32m        List<Student> students = List.of();[m
+[32m+[m
+[32m+[m[32m        assertThrows(IllegalArgumentException.class, () -> csvWriter.writeToFile(students,"csv_file"));[m
+[32m+[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    private List<Student> generateStudent(){[m
+[32m+[m[32m        return  List.of([m
+[32m+[m[32m                Student.builder().name("Dodie Schinner").score(Arrays.asList("5", "4", "3")).build()[m
+[32m+[m[32m        );[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    private List<Person> generatePerson(){[m
+[32m+[m[32m        return  List.of([m
+[32m+[m[32m                Person.builder()[m
+[32m+[m[32m                        .firstName("Dodie")[m
+[32m+[m[32m                        .lastName("Schinner")[m
+[32m+[m[32m                        .dayOfBirth(4)[m
+[32m+[m[32m                        .monthOfBirth(Months.APRIL)[m
+[32m+[m[32m                        .yearOfBirth(2011).build());[m
+[32m+[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m
+[32m+[m[32m}[m
+\ No newline at end of file[m
+[1mdiff --git a/src/test/java/org/writer/csv/person_file_test b/src/test/java/org/writer/csv/person_file_test[m
+[1mnew file mode 100644[m
+[1mindex 0000000..e69de29[m
+[1mdiff --git a/src/test/java/org/writer/csv/students_file_test b/src/test/java/org/writer/csv/students_file_test[m
+[1mnew file mode 100644[m
+[1mindex 0000000..e69de29[m
+[1mdiff --git a/students_file b/students_file[m
+[1mnew file mode 100644[m
+[1mindex 0000000..e69de29[m

@@ -1,16 +1,13 @@
-package org.writer;
+package writer;
 
 import com.github.javafaker.Faker;
-import writer.Writable;
 import writer.csv.CsvWriterService;
 import writer.model.Months;
 import writer.model.Person;
 import writer.model.Student;
 
-
 import java.util.Arrays;
 import java.util.List;
-
 
 public class Main {
     public static void main(String[] args) {
@@ -33,11 +30,9 @@ public class Main {
                         .yearOfBirth(faker.number().numberBetween(1950, 2020)).build()
         );
 
-
         Writable csvWriter = new CsvWriterService();
-        csvWriter.writeToFile(students, "students_file");
-        csvWriter.writeToFile(people, "person_file");
-
+        csvWriter.writeToFile(students,"students_file");
+        csvWriter.writeToFile(people,"person_file");
     }
 
 
