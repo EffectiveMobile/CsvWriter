@@ -34,7 +34,7 @@ public class CsvWriter implements Writable {
                 }
             }
         } catch (IOException e) {
-            System.err.println("Failed to write CSV file: " + e.getMessage());
+            throw new RuntimeException("Failed to write CSV file: " + e.getMessage());
         }
     }
 
@@ -45,11 +45,11 @@ public class CsvWriter implements Writable {
 
         for (Field field : fields) {
             field.setAccessible(true);
-            Object value = null;
+            Object value;
             try {
                 value = field.get(object);
             } catch (IllegalAccessException e) {
-                System.err.println("Failed to access to field value: " + e.getMessage());
+                throw new RuntimeException("Failed to access to field value: " + e.getMessage());
             }
 
             if (value != null && isList(field)) {
