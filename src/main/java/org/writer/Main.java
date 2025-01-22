@@ -10,11 +10,13 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
+        //создание директории, в которой будут храниться успешно сгенерированные файлы
         File directory = new File("csv");
         if (!directory.exists()) {
             directory.mkdir();
         }
 
+        //Подготовка данных для записи в файл
         List<Person> persons = new ArrayList<>();
         Person person1 = Person.builder()
                 .firstName("Alex")
@@ -38,9 +40,12 @@ public class Main {
         persons.add(person2);
         persons.add(person3);
 
+        //Запись в файл формата CSV
         CsvWriter writer = new CsvWriter();
         writer.writeToFile(persons, "csv/persons.csv");
 
+        //Еще один пример успешной генерации CSV файла, в том числе рассмотрен случай,
+        //где одно из полей у объекта - это List
         List<String> scores1 = new ArrayList<>();
         scores1.add("5");
         scores1.add("4");
@@ -88,5 +93,8 @@ public class Main {
         students.add(student5);
 
         writer.writeToFile(students, "csv/students.csv");
+
+        //Запись в файл пустого списка, где результат - это пустой файл
+        writer.writeToFile(new ArrayList<>(), "csv/empty.csv");
     }
 }
