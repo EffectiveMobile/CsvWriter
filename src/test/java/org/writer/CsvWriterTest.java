@@ -24,6 +24,11 @@ class CsvWriterTest {
         csvWriter = new CsvWriter();
     }
 
+    /**
+     * Тестирует метод записи данных в файл в CSV формате.
+     * Успешная запись в файл данных об объектах, классы которых помечены аннотацией {@code CSV}.
+     * @throws IOException не выбрасывается.
+     */
     @Test
     void writeToFileTest() throws IOException {
         Path file = Files.createTempFile("test", ".csv");
@@ -62,6 +67,11 @@ class CsvWriterTest {
         assertEquals("-,Barkley,16,FEBRUARY,1993", lines.get(3));
     }
 
+    /**
+     * Тестирует метод записи данных в файл с null в качестве параметра {@code data}.
+     * Возникает {@link NullPointerException}.
+     * @throws IOException не выбрасывается.
+     */
     @Test
     void writeToFileNullTest() throws IOException {
         Path file = Files.createTempFile("null", ".csv");
@@ -73,6 +83,11 @@ class CsvWriterTest {
                 exception.getMessage());
     }
 
+    /**
+     * Тестирует метод записи данных в файл с пустым списком в качестве параметра {@code data}.
+     * Получаем пустой файл.
+     * @throws IOException не выбрасывается.
+     */
     @Test
     void writeToFileEmptyListTest() throws IOException {
         Path file = Files.createTempFile("empty", ".csv");
@@ -83,6 +98,11 @@ class CsvWriterTest {
         assertTrue(lines.isEmpty());
     }
 
+    /**
+     * Тестирует метод записи данных в файл с элементами {@code data}, классы которых не помечены аннотацией {@code CSV}.
+     * Как и ожидается, получим {@link RuntimeException}.
+     * @throws IOException не выбрасывается.
+     */
     @Test
     void writeToFileNotAnnotatedTest() throws IOException {
         Path file = Files.createTempFile("notCsv", ".csv");
@@ -95,13 +115,17 @@ class CsvWriterTest {
         assertTrue(exception.getMessage().contains("Passed class is not annotated by @CSV:"));
     }
 
+    /**
+     * Тестирует метод записи данных в файл при отсутствии такого файла.
+     * Как и ожидается, получим {@link RuntimeException}.
+     */
     @Test
     void writeToNonExistentFileTest() {
         List<Student> students = new ArrayList<>();
         students.add(Student.builder().name("Taylor").build());
 
         RuntimeException exception = assertThrows(RuntimeException.class, () ->
-                csvWriter.writeToFile(students, "csv"));
+                csvWriter.writeToFile(students, "data/output"));
 
         assertTrue(exception.getMessage().contains("Failed to write CSV file:"));
     }
