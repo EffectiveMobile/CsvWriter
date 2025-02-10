@@ -61,7 +61,7 @@ public class FormatterLineServiceImpl implements FormatterLineService {
                                                 if (val instanceof Collection<?> collection) {
                                                     return Stream.of(getCollectionsData(collection));
                                                 }else{
-                                                    return Stream.of(String.valueOf(val));
+                                                    return Stream.of(String.valueOf(val == null ? "" : String.valueOf(val)));
                                                 }
                                             } catch (IllegalAccessException e) {
                                                 throw new FieldAccessException("Field access error", e);

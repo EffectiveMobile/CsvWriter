@@ -50,6 +50,26 @@ public class WritableServiceImplTest {
         assertEquals(expectedHeaders, lines.get(0));
     }
 
+    @Test
+    void nullDataTest() {
+        String fileName = TEST_DIRECTORY + File.separator + "test_null.csv";
+
+        personList.get(0).setFirstName(null);
+        personList.get(0).setMonthOfBirth(null);
+
+        assertDoesNotThrow(() -> writableService.writeToFile(personList, fileName));
+
+        File file = new File(fileName);
+        assertTrue(file.exists());
+        assertTrue(file.isFile());
+
+        List<String> lines = assertDoesNotThrow(() -> Files.readAllLines(Paths.get(fileName)));
+        assertFalse(lines.isEmpty());
+        assertEquals(personList.size() + 1, lines.size());
+
+        String expectedHeaders = String.join(",", "Firstname", "Lastname", "Day of birth", "Month of birth", "Year of birth");
+        assertEquals(expectedHeaders, lines.get(0));
+    }
 
     @Test
     void generatingManyData() {
