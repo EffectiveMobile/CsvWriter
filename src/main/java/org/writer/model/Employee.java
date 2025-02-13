@@ -8,24 +8,24 @@ import lombok.experimental.SuperBuilder;
 import org.writer.annotation.CsvFieldOrder;
 import org.writer.validation.annotation.ValidCsvField;
 
-import java.util.List;
+import java.math.BigDecimal;
 
 /**
- * Represents a student entity.
- * Extends {@link CsvModel} and includes student-specific details such as name and scores.
+ * Represents an employee entity.
+ * Extends {@link CsvModel} and includes department and salary information.
  */
 @Data
 @ToString(callSuper = true)
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
-public class Student extends CsvModel {
+public class Employee extends CsvModel {
 
     @ValidCsvField
     @CsvFieldOrder(2)
-    private String name;
+    private String department;
 
     @ValidCsvField
     @CsvFieldOrder(3)
-    private List<String> score;
+    private BigDecimal salary;
 }

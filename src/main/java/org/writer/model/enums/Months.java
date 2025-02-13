@@ -1,5 +1,8 @@
-package org.writer.model;
+package org.writer.model.enums;
 
+/**
+ * Represents the months of the year.
+ */
 public enum Months {
     JANUARY,
     FEBRUARY,
