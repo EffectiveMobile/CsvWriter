@@ -2,7 +2,7 @@ package org.writer.service;
 
 /**
  * Service for writing specific types of data (people, students, employees) to CSV files.
- * Extends the functionality of {@link CsvWriterService} for specialized use cases.
+ * Extends the functionality of {@link CsvWriterToFileService} for specialized use cases.
  */
 public interface CsvDataWriterService {
 

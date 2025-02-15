@@ -4,83 +4,65 @@ import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.writer.annotation.CsvFieldOrder;
 import org.writer.exception.CsvReflectionException;
+import org.writer.exception.handler.CsvErrorHandler;
+import org.writer.util.sorter.CsvFieldSorter;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /**
- * Utility class for reflection-based operations on CSV models.
- * Provides methods to retrieve and process fields of a class, including sorting by {@link CsvFieldOrder}.
+ * Utility class for handling reflection-based operations in CSV processing.
  */
-@Slf4j
-@UtilityClass
-public class CsvReflectionUtil {
+    @Slf4j
+    @UtilityClass
+    public class CsvReflectionUtil {
+        private static final CsvErrorHandler errorHandler = new CsvErrorHandler();
 
-    /**
-     * Retrieves all fields of a class, including those from its superclasses.
-     * Fields are sorted based on the {@link CsvFieldOrder} annotation.
-     *
-     * @param clazz the class to retrieve fields from.
-     * @return a sorted list of fields.
-     * @throws CsvReflectionException if a security violation or unexpected error occurs.
-     */
-    public static List<Field> getAllFields(Class<?> clazz) {
-        List<Field> fields = new ArrayList<>();
+        /**
+         * Retrieves all fields of a given class, including inherited fields from superclasses.
+         * The fields are sorted according to the {@link CsvFieldOrder} annotation.
+         *
+         * @param clazz the class from which to retrieve fields.
+         * @return a sorted list of fields.
+         * @throws CsvReflectionException if an error occurs while retrieving fields.
+         */
+        public static List<Field> getAllFields(Class<?> clazz) {
+            List<Field> fields = new ArrayList<>();
 
-        while (clazz != null) {
-            try {
-                Field[] declaredFields = clazz.getDeclaredFields();
-                Collections.addAll(fields, declaredFields);
-            } catch (SecurityException ex) {
-                log.error("Security violation while accessing fields of class: {}", clazz.getName(), ex);
-                throw new CsvReflectionException(
-                        "Security violation while accessing fields of class: " + clazz.getName(), ex);
-            } catch (Exception ex) {
-                log.error("Unexpected error while retrieving fields for class: {}", clazz.getName(), ex);
-                throw new CsvReflectionException(
-                        "Unexpected error while retrieving fields for class: " + clazz.getName(), ex);
+            while (clazz != null) {
+                try {
+                    Field[] declaredFields = clazz.getDeclaredFields();
+                    Collections.addAll(fields, declaredFields);
+                } catch (Exception ex) {
+                    errorHandler.handleError("Error retrieving fields for class: " + clazz.getName(), ex,
+                            CsvReflectionException.class);
+                }
+                clazz = clazz.getSuperclass();
             }
-            clazz = clazz.getSuperclass();
+
+            CsvFieldSorter.sortFields(fields);
+
+            log.info("Total fields retrieved: {}", fields.size());
+            return fields;
         }
 
-        fields.sort(Comparator.comparingInt(field -> {
-            CsvFieldOrder order = field.getAnnotation(CsvFieldOrder.class);
-            return order != null ?
-                    order.value() :
-                    Integer.MAX_VALUE;
-        }));
-
-        log.info("Total fields retrieved: {}", fields.size());
-        return fields;
-    }
-
-    /**
-     * Retrieves the value of a field from an object using reflection.
-     *
-     * @param object the object to retrieve the field value from.
-     * @param field  the field to access.
-     * @return the value of the field.
-     * @throws CsvReflectionException if the field cannot be accessed or an unexpected error occurs.
-     */
-    public static Object getFieldValue(Object object, Field field) {
-        try {
-            field.setAccessible(true);
-            return field.get(object);
-        } catch (IllegalAccessException ex) {
-            log.error("Failed to access field: {}", field.getName(), ex);
-            throw new CsvReflectionException("Failed to access field: " + field.getName(), ex);
-        } catch (IllegalArgumentException ex) {
-            log.error("Invalid argument provided for field: {}", field.getName(), ex);
-            throw new CsvReflectionException("Invalid argument provided for field: " + field.getName(), ex);
-        } catch (SecurityException ex) {
-            log.error("Security violation while accessing field: {}", field.getName(), ex);
-            throw new CsvReflectionException("Security violation while accessing field: " + field.getName(), ex);
-        } catch (Exception ex) {
-            log.error("Unexpected error while accessing field: {}", field.getName(), ex);
-            throw new CsvReflectionException("Unexpected error while accessing field: " + field.getName(), ex);
+        /**
+         * Retrieves the value of a specified field from an object using reflection.
+         *
+         * @param object the object from which to extract the field value.
+         * @param field  the field to access.
+         * @return the value of the field.
+         * @throws CsvReflectionException if the field cannot be accessed.
+         */
+        public static Object getFieldValue(Object object, Field field) {
+            try {
+                field.setAccessible(true);
+                return field.get(object);
+            } catch (Exception ex) {
+                errorHandler.handleError("Error accessing field: " + field.getName(), ex, CsvReflectionException.class);
+                throw new AssertionError("Unreachable code");
+            }
         }
     }
-}

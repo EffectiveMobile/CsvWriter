@@ -6,9 +6,9 @@ import java.util.List;
 
 /**
  * Service for writing data to CSV files.
- * Provides a generic method to write a list of {@link CsvModel} objects to a specified file.
+ * Provides a method to write a list of {@link CsvModel} objects to a specified file.
  */
-public interface CsvWriterService {
+public interface CsvWriterToFileService {
 
     /**
      * Writes a list of data objects to a CSV file.

@@ -7,7 +7,7 @@ import org.writer.exception.CsvFileWriteException;
 import org.writer.exception.CsvUnexpectedException;
 import org.writer.model.CsvModel;
 import org.writer.service.CsvDataWriterService;
-import org.writer.service.CsvWriterService;
+import org.writer.service.CsvWriterToFileService;
 import org.writer.util.data.EmployeeDataUtil;
 import org.writer.util.data.PersonDataUtil;
 import org.writer.util.data.StudentDataUtil;
@@ -17,12 +17,12 @@ import java.util.List;
 /**
  * Implementation of the {@link CsvDataWriterService} interface.
  * Provides methods to write specific types of data (people, students, employees) to CSV files.
- * Uses a {@link CsvWriterService} to handle the actual file writing.
+ * Uses a {@link CsvWriterToFileService} to handle the actual file writing.
  */
 @Slf4j
 @RequiredArgsConstructor
 public class CsvDataWriterServiceImpl implements CsvDataWriterService {
-    private final CsvWriterService csvWriterService;
+    private final CsvWriterToFileService csvWriterToFileService;
 
     /**
      * Writes people data to a CSV file.
@@ -66,7 +66,7 @@ public class CsvDataWriterServiceImpl implements CsvDataWriterService {
      */
     private void writeToFile(List<? extends CsvModel> data, String fileName) {
         try {
-            csvWriterService.writeToFile(data, fileName);
+            csvWriterToFileService.writeToFile(data, fileName);
             log.info("CSV file generated successfully: {}", fileName);
         } catch (CsvDataException | CsvFileWriteException | CsvUnexpectedException ex) {
             log.error("Error generating CSV file: {} - {}", fileName, ex.getMessage());
