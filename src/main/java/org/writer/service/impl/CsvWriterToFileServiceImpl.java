@@ -1,7 +1,6 @@
 package org.writer.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.writer.exception.CsvDataException;
 import org.writer.exception.CsvFileWriteException;
 import org.writer.exception.CsvUnexpectedException;
@@ -18,7 +17,6 @@ import java.util.List;
 /**
  * Service for writing a list of data objects to a CSV file.
  */
-@Slf4j
 @RequiredArgsConstructor
 public class CsvWriterToFileServiceImpl implements CsvWriterToFileService {
     private final CsvErrorHandler csvErrorHandler;
@@ -51,7 +49,6 @@ public class CsvWriterToFileServiceImpl implements CsvWriterToFileService {
                 csvRowWriterService.writeRow(fields, object);
             }
 
-            log.info("CSV file generated successfully: {}", fileName);
         } catch (Exception ex) {
             csvErrorHandler.handleError("Unexpected error while writing to CSV file: " + fileName, ex,
                     CsvUnexpectedException.class);
