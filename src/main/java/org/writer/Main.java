@@ -1,5 +1,6 @@
 package org.writer;
 
+import lombok.extern.slf4j.Slf4j;
 import org.writer.exception.CsvFileWriteException;
 import org.writer.exception.handler.CsvErrorHandler;
 import org.writer.formatter.CsvFieldFormatter;
@@ -21,6 +22,7 @@ import java.io.IOException;
  * This application demonstrates the usage of {@link CsvDataWriterService} to generate CSV files
  * for different entity types, including people, students, and employees.
  */
+@Slf4j
 public class Main {
 
     /**
@@ -54,11 +56,21 @@ public class Main {
             CsvDataWriterService csvDataWriterService = new CsvDataWriterServiceImpl(errorHandler,
                     csvWriterToFileService);
 
-            switch (dataType) {
-                case PEOPLE -> csvDataWriterService.writePeopleToFile(fileName);
-                case STUDENTS -> csvDataWriterService.writeStudentsToFile(fileName);
-                case EMPLOYEES -> csvDataWriterService.writeEmployeesToFile(fileName);
-            }
+            String result = switch (dataType) {
+                case PEOPLE -> {
+                    csvDataWriterService.writePeopleToFile(fileName);
+                    yield "File: " + fileName + " written successfully";
+                }
+                case STUDENTS -> {
+                    csvDataWriterService.writeStudentsToFile(fileName);
+                    yield "File: " + fileName + " written successfully";
+                }
+                case EMPLOYEES -> {
+                    csvDataWriterService.writeEmployeesToFile(fileName);
+                    yield "File: " + fileName + " written successfully";
+                }
+            };
+            log.info(result);
 
         } catch (IOException ex) {
             errorHandler.handleError("Failed to write data to file: " + fileName, ex, CsvFileWriteException.class);
