@@ -51,7 +51,8 @@ public class Main {
 
             CsvWriterToFileService csvWriterToFileService = createCsvWriterToFileService(writer, errorHandler,
                     fieldFormatter);
-            CsvDataWriterService csvDataWriterService = new CsvDataWriterServiceImpl(csvWriterToFileService);
+            CsvDataWriterService csvDataWriterService = new CsvDataWriterServiceImpl(errorHandler,
+                    csvWriterToFileService);
 
             switch (dataType) {
                 case PEOPLE -> csvDataWriterService.writePeopleToFile(fileName);

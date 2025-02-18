@@ -56,6 +56,7 @@ public class CsvHeaderWriterServiceImplTest {
     @Test
     public void testWriteHeadersForEmployeeSuccess() throws IOException, NoSuchFieldException {
         List<Field> fields = getFields(Employee.class, "id", "department", "salary");
+
         mockedStatic.when(() -> CsvFieldValidator.isValidField(any(Field.class)))
                 .thenReturn(true);
 
@@ -74,6 +75,7 @@ public class CsvHeaderWriterServiceImplTest {
     public void testWriteHeadersForPersonSuccess() throws IOException, NoSuchFieldException {
         List<Field> fields = getFields(Person.class, "id", "firstName", "lastName", "dayOfBirth", "monthOfBirth",
                 "yearOfBirth");
+
         mockedStatic.when(() -> CsvFieldValidator.isValidField(any(Field.class)))
                 .thenReturn(true);
 
@@ -94,6 +96,7 @@ public class CsvHeaderWriterServiceImplTest {
     @Test
     public void testWriteHeadersForStudentSuccess() throws IOException, NoSuchFieldException {
         List<Field> fields = getFields(Student.class, "id", "name", "score");
+
         mockedStatic.when(() -> CsvFieldValidator.isValidField(any(Field.class)))
                 .thenReturn(true);
 
@@ -111,6 +114,7 @@ public class CsvHeaderWriterServiceImplTest {
     @Test
     public void testWriteHeadersWithIOException() throws IOException, NoSuchFieldException {
         List<Field> fields = getFields(Employee.class, "id", "department", "salary");
+
         mockedStatic.when(() -> CsvFieldValidator.isValidField(any(Field.class)))
                 .thenReturn(true);
         doThrow(new IOException("Test exception")).when(bufferedWriter)

@@ -37,8 +37,8 @@ public class CsvHeaderWriterServiceImpl implements CsvHeaderWriterService {
             }
             bufferedWriter.write(headerLine.toString());
             bufferedWriter.newLine();
-        } catch (IOException e) {
-            csvErrorHandler.handleError("Error writing CSV headers", e, CsvFileWriteException.class);
+        } catch (IOException ex) {
+            csvErrorHandler.handleError("Error writing CSV headers", ex, CsvFileWriteException.class);
         }
     }
 }

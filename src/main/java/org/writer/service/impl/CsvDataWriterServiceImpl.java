@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.writer.exception.CsvDataException;
 import org.writer.exception.CsvFileWriteException;
 import org.writer.exception.CsvUnexpectedException;
+import org.writer.exception.CsvWriterException;
+import org.writer.exception.handler.CsvErrorHandler;
 import org.writer.model.CsvModel;
 import org.writer.service.CsvDataWriterService;
 import org.writer.service.CsvWriterToFileService;
@@ -22,6 +24,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class CsvDataWriterServiceImpl implements CsvDataWriterService {
+    private final CsvErrorHandler csvErrorHandler;
     private final CsvWriterToFileService csvWriterToFileService;
 
     /**
@@ -69,7 +72,7 @@ public class CsvDataWriterServiceImpl implements CsvDataWriterService {
             csvWriterToFileService.writeToFile(data, fileName);
             log.info("CSV file generated successfully: {}", fileName);
         } catch (CsvDataException | CsvFileWriteException | CsvUnexpectedException ex) {
-            log.error("Error generating CSV file: {} - {}", fileName, ex.getMessage());
+            csvErrorHandler.handleError("Error generating CSV file: " + fileName, ex, CsvWriterException.class);
         }
     }
 }

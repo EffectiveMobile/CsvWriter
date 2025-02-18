@@ -10,6 +10,8 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.writer.exception.CsvFileWriteException;
+import org.writer.exception.CsvWriterException;
+import org.writer.exception.handler.CsvErrorHandler;
 import org.writer.model.CsvModel;
 import org.writer.service.CsvWriterToFileService;
 import org.writer.util.data.EmployeeDataUtil;
@@ -20,12 +22,17 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 public class CsvDataWriterServiceImplTest {
+
+    @Mock
+    private CsvErrorHandler csvErrorHandler;
 
     @Mock
     private CsvWriterToFileService csvWriterToFileService;
@@ -54,6 +61,7 @@ public class CsvDataWriterServiceImplTest {
     @Test
     public void testWritePeopleToFileSuccess() {
         List<CsvModel> people = List.of(mock(CsvModel.class), mock(CsvModel.class));
+
         mockedStaticPersonDataUtil.when(PersonDataUtil::getPeople)
                 .thenReturn(people);
 
@@ -65,6 +73,7 @@ public class CsvDataWriterServiceImplTest {
     @Test
     public void testWriteStudentsToFileSuccess() {
         List<CsvModel> students = List.of(mock(CsvModel.class), mock(CsvModel.class));
+
         mockedStaticStudentDataUtil.when(StudentDataUtil::getStudents)
                 .thenReturn(students);
 
@@ -76,6 +85,7 @@ public class CsvDataWriterServiceImplTest {
     @Test
     public void testWriteEmployeesToFileSuccess() {
         List<CsvModel> employees = List.of(mock(CsvModel.class), mock(CsvModel.class));
+
         mockedStaticEmployeeDataUtil.when(EmployeeDataUtil::getEmployees)
                 .thenReturn(employees);
 
@@ -87,13 +97,20 @@ public class CsvDataWriterServiceImplTest {
     @Test
     public void testWriteToFileWithException() {
         List<CsvModel> employees = List.of(mock(CsvModel.class), mock(CsvModel.class));
+
         mockedStaticEmployeeDataUtil.when(EmployeeDataUtil::getEmployees)
                 .thenReturn(employees);
+
         doThrow(new CsvFileWriteException("Test exception", new RuntimeException())).when(csvWriterToFileService)
                 .writeToFile(any(), anyString());
+        doNothing().when(csvErrorHandler)
+                .handleError(anyString(), any(), eq(CsvWriterException.class));
 
         csvDataWriterService.writeEmployeesToFile("employees.csv");
 
         verify(csvWriterToFileService).writeToFile(employees, "employees.csv");
+
+        verify(csvErrorHandler).handleError(eq("Error generating CSV file: employees.csv"),
+                any(CsvFileWriteException.class), eq(CsvWriterException.class));
     }
 }
