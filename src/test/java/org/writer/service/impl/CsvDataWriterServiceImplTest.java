@@ -20,13 +20,12 @@ import org.writer.util.data.StudentDataUtil;
 
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class CsvDataWriterServiceImplTest {
@@ -101,16 +100,26 @@ public class CsvDataWriterServiceImplTest {
         mockedStaticEmployeeDataUtil.when(EmployeeDataUtil::getEmployees)
                 .thenReturn(employees);
 
-        doThrow(new CsvFileWriteException("Test exception", new RuntimeException())).when(csvWriterToFileService)
-                .writeToFile(any(), anyString());
-        doNothing().when(csvErrorHandler)
-                .handleError(anyString(), any(), eq(CsvWriterException.class));
+        CsvFileWriteException testException = new CsvFileWriteException("Test exception", new RuntimeException());
 
-        csvDataWriterService.writeEmployeesToFile("employees.csv");
+        CsvWriterException mockException = mock(CsvWriterException.class);
 
-        verify(csvWriterToFileService).writeToFile(employees, "employees.csv");
+        doThrow(testException).when(csvWriterToFileService)
+                .writeToFile(eq(employees), eq("employees.csv"));
 
-        verify(csvErrorHandler).handleError(eq("Error generating CSV file: employees.csv"),
-                any(CsvFileWriteException.class), eq(CsvWriterException.class));
+        when(csvErrorHandler.handleError(
+                eq("Error generating CSV file: employees.csv"),
+                eq(testException),
+                eq(CsvWriterException.class)
+        )).thenThrow(mockException);
+
+        assertThrows(CsvWriterException.class, () -> csvDataWriterService.writeEmployeesToFile("employees.csv"));
+
+        verify(csvWriterToFileService).writeToFile(eq(employees), eq("employees.csv"));
+        verify(csvErrorHandler).handleError(
+                eq("Error generating CSV file: employees.csv"),
+                eq(testException),
+                eq(CsvWriterException.class)
+        );
     }
 }

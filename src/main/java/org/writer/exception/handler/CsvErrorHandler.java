@@ -17,7 +17,7 @@ public class CsvErrorHandler {
      * @param <T>           Exception type.
      * @throws T If instantiation fails, a {@link RuntimeException} is thrown.
      */
-    public <T extends Exception> void handleError(String message, Exception ex, Class<T> exceptionType) throws T {
+    public <T extends Exception> T handleError(String message, Exception ex, Class<T> exceptionType) throws T {
         log.error(message, ex);
 
         try {

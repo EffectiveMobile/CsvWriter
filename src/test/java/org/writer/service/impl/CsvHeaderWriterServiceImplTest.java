@@ -21,12 +21,13 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringJoiner;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class CsvHeaderWriterServiceImplTest {
@@ -57,17 +58,16 @@ public class CsvHeaderWriterServiceImplTest {
     public void testWriteHeadersForEmployeeSuccess() throws IOException, NoSuchFieldException {
         List<Field> fields = getFields(Employee.class, "id", "department", "salary");
 
-        mockedStatic.when(() -> CsvFieldValidator.isValidField(any(Field.class)))
-                .thenReturn(true);
+        for (Field field : fields) {
+            mockedStatic.when(() -> CsvFieldValidator.isValidField(eq(field)))
+                    .thenReturn(true);
+        }
 
         csvHeaderWriterService.writeHeaders(fields);
 
-        var expectedHeaderLine = new StringJoiner(",")
-                .add("id")
-                .add("department")
-                .add("salary")
-                .toString();
-        verify(bufferedWriter).write(expectedHeaderLine);
+        String expectedHeaderLine = "id,department,salary";
+
+        verify(bufferedWriter).write(eq(expectedHeaderLine));
         verify(bufferedWriter).newLine();
     }
 
@@ -76,20 +76,16 @@ public class CsvHeaderWriterServiceImplTest {
         List<Field> fields = getFields(Person.class, "id", "firstName", "lastName", "dayOfBirth", "monthOfBirth",
                 "yearOfBirth");
 
-        mockedStatic.when(() -> CsvFieldValidator.isValidField(any(Field.class)))
-                .thenReturn(true);
+        for (Field field : fields) {
+            mockedStatic.when(() -> CsvFieldValidator.isValidField(eq(field)))
+                    .thenReturn(true);
+        }
 
         csvHeaderWriterService.writeHeaders(fields);
 
-        var expectedHeaderLine = new StringJoiner(",")
-                .add("id")
-                .add("firstName")
-                .add("lastName")
-                .add("dayOfBirth")
-                .add("monthOfBirth")
-                .add("yearOfBirth")
-                .toString();
-        verify(bufferedWriter).write(expectedHeaderLine);
+        String expectedHeaderLine = "id,firstName,lastName,dayOfBirth,monthOfBirth,yearOfBirth";
+
+        verify(bufferedWriter).write(eq(expectedHeaderLine));
         verify(bufferedWriter).newLine();
     }
 
@@ -97,17 +93,16 @@ public class CsvHeaderWriterServiceImplTest {
     public void testWriteHeadersForStudentSuccess() throws IOException, NoSuchFieldException {
         List<Field> fields = getFields(Student.class, "id", "name", "score");
 
-        mockedStatic.when(() -> CsvFieldValidator.isValidField(any(Field.class)))
-                .thenReturn(true);
+        for (Field field : fields) {
+            mockedStatic.when(() -> CsvFieldValidator.isValidField(eq(field)))
+                    .thenReturn(true);
+        }
 
         csvHeaderWriterService.writeHeaders(fields);
 
-        var expectedHeaderLine = new StringJoiner(",")
-                .add("id")
-                .add("name")
-                .add("score")
-                .toString();
-        verify(bufferedWriter).write(expectedHeaderLine);
+        String expectedHeaderLine = "id,name,score";
+
+        verify(bufferedWriter).write(eq(expectedHeaderLine));
         verify(bufferedWriter).newLine();
     }
 
@@ -115,18 +110,35 @@ public class CsvHeaderWriterServiceImplTest {
     public void testWriteHeadersWithIOException() throws IOException, NoSuchFieldException {
         List<Field> fields = getFields(Employee.class, "id", "department", "salary");
 
-        mockedStatic.when(() -> CsvFieldValidator.isValidField(any(Field.class)))
-                .thenReturn(true);
-        doThrow(new IOException("Test exception")).when(bufferedWriter)
-                .write(any(String.class));
+        for (Field field : fields) {
+            mockedStatic.when(() -> CsvFieldValidator.isValidField(eq(field)))
+                    .thenReturn(true);
+        }
 
-        csvHeaderWriterService.writeHeaders(fields);
+        String expectedHeaderLine = "id,department,salary";
+        IOException testException = new IOException("Test exception");
 
-        verify(csvErrorHandler).handleError(any(String.class), any(IOException.class), eq(CsvFileWriteException.class));
+        CsvFileWriteException mockException = mock(CsvFileWriteException.class);
+
+        doThrow(testException).when(bufferedWriter)
+                .write(eq(expectedHeaderLine));
+
+        when(csvErrorHandler.handleError(
+                eq("Error writing CSV headers"),
+                eq(testException),
+                eq(CsvFileWriteException.class)
+        )).thenThrow(mockException);
+
+        assertThrows(CsvFileWriteException.class, () -> csvHeaderWriterService.writeHeaders(fields));
+
+        verify(csvErrorHandler).handleError(eq("Error writing CSV headers"), eq(testException),
+                eq(CsvFileWriteException.class));
     }
+
 
     private List<Field> getFields(Class<?> clazz, String... fieldNames) throws NoSuchFieldException {
         List<Field> fields = new ArrayList<>();
+
         for (String fieldName : fieldNames) {
             fields.add(getFieldFromClassHierarchy(clazz, fieldName));
         }
@@ -135,6 +147,7 @@ public class CsvHeaderWriterServiceImplTest {
 
     private Field getFieldFromClassHierarchy(Class<?> clazz, String fieldName) throws NoSuchFieldException {
         Class<?> currentClass = clazz;
+
         while (currentClass != null) {
             try {
                 return currentClass.getDeclaredField(fieldName);
@@ -143,7 +156,8 @@ public class CsvHeaderWriterServiceImplTest {
             }
         }
         if (clazz != null) {
-            throw new NoSuchFieldException("Field '" + fieldName + "' not found in class hierarchy of " + clazz.getName());
+            throw new NoSuchFieldException(
+                    "Field '" + fieldName + "' not found in class hierarchy of " + clazz.getName());
         } else {
             throw new NoSuchFieldException("Field '" + fieldName + "' not found and class is null");
         }

@@ -44,9 +44,10 @@ public class CsvRowWriterServiceImpl implements CsvRowWriterService {
             bufferedWriter.write(rowLine.toString());
             bufferedWriter.newLine();
         } catch (IOException e) {
-            csvErrorHandler.handleError("Error writing CSV row", e, CsvFileWriteException.class);
+            throw csvErrorHandler.handleError("Error writing CSV row", e, CsvFileWriteException.class);
         } catch (CsvReflectionException e) {
-            csvErrorHandler.handleError("Error accessing field values via reflection", e, CsvReflectionException.class);
+            throw csvErrorHandler.handleError("Error accessing field values via reflection", e,
+                    CsvReflectionException.class);
         }
     }
 }

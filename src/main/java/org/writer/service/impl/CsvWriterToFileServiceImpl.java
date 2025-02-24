@@ -50,7 +50,7 @@ public class CsvWriterToFileServiceImpl implements CsvWriterToFileService {
             }
 
         } catch (Exception ex) {
-            csvErrorHandler.handleError("Unexpected error while writing to CSV file: " + fileName, ex,
+            throw csvErrorHandler.handleError("Unexpected error while writing to CSV file: " + fileName, ex,
                     CsvUnexpectedException.class);
         }
     }

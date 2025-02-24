@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
@@ -71,7 +71,7 @@ public class CsvWriterToFileServiceImplTest {
                 Employee.class.getDeclaredField("salary")
         );
 
-        mockedStaticReflectionUtil.when(() -> CsvReflectionUtil.getAllFields(any()))
+        mockedStaticReflectionUtil.when(() -> CsvReflectionUtil.getAllFields(Employee.class))
                 .thenReturn(fields);
 
         csvWriterToFileService.writeToFile(employees, "test.csv");
@@ -88,21 +88,37 @@ public class CsvWriterToFileServiceImplTest {
         Employee employee2 = new Employee("Finance", new BigDecimal("6000"));
         employee2.setId("2");
 
-        List<Employee> employees = List.of(employee1, employee2);
         List<Field> fields = List.of(
                 CsvModel.class.getDeclaredField("id"),
                 Employee.class.getDeclaredField("department"),
                 Employee.class.getDeclaredField("salary")
         );
 
-        mockedStaticReflectionUtil.when(() -> CsvReflectionUtil.getAllFields(any()))
+        List<Employee> employees = List.of(employee1, employee2);
+
+        mockedStaticReflectionUtil.when(() -> CsvReflectionUtil.getAllFields(Employee.class))
                 .thenReturn(fields);
-        doThrow(new RuntimeException("Test exception")).when(csvRowWriterService)
-                .writeRow(any(), any());
 
-        csvWriterToFileService.writeToFile(employees, "test.csv");
+        RuntimeException testException = new RuntimeException("Test exception");
 
-        verify(csvErrorHandler).handleError(anyString(), any(RuntimeException.class), eq(CsvUnexpectedException.class));
+        doThrow(testException).when(csvRowWriterService)
+                .writeRow(eq(fields), argThat(obj -> obj instanceof Employee));
+
+        doThrow(new CsvUnexpectedException("Wrapped exception", testException)).when(csvErrorHandler)
+                .handleError(
+                        argThat(message -> message.contains("Unexpected error while writing to CSV file")),
+                        eq(testException),
+                        eq(CsvUnexpectedException.class)
+                );
+
+        assertThrows(CsvUnexpectedException.class,
+                () -> csvWriterToFileService.writeToFile(employees, "employees.csv"));
+
+        verify(csvErrorHandler).handleError(
+                argThat(message -> message.contains("Unexpected error while writing to CSV file")),
+                eq(testException),
+                eq(CsvUnexpectedException.class)
+        );
     }
 
     @Test

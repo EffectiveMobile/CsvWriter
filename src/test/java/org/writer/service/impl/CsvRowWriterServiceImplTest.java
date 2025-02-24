@@ -12,7 +12,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.writer.exception.CsvFileWriteException;
 import org.writer.exception.handler.CsvErrorHandler;
 import org.writer.formatter.CsvFieldFormatter;
-import org.writer.model.CsvModel;
 import org.writer.model.Employee;
 import org.writer.model.Person;
 import org.writer.model.Student;
@@ -26,11 +25,11 @@ import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringJoiner;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -71,28 +70,23 @@ public class CsvRowWriterServiceImplTest {
         Employee employee = new Employee("HR", new BigDecimal("5000"));
         employee.setId("1");
 
-        mockedStaticValidator.when(() -> CsvFieldValidator.isValidField(any(Field.class)))
-                .thenReturn(true);
-        mockedStaticReflectionUtil.when(() -> CsvReflectionUtil.getFieldValue(any(CsvModel.class), any(Field.class)))
-                .thenAnswer(invocation -> {
-                    Field field = invocation.getArgument(1);
-                    field.setAccessible(true);
-                    return field.get(employee);
-                });
-        when(csvFieldFormatter.format(any())).thenAnswer(invocation -> {
-            var argument = invocation.getArgument(0);
-            return argument != null ?
-                    argument.toString() :
-                    "";
-        });
+        for (Field field : fields) {
+            mockedStaticValidator.when(() -> CsvFieldValidator.isValidField(field))
+                    .thenReturn(true);
+            mockedStaticReflectionUtil.when(() -> CsvReflectionUtil.getFieldValue(employee, field))
+                    .thenAnswer(invocation -> {
+                        field.setAccessible(true);
+                        return field.get(employee);
+                    });
+        }
+
+        when(csvFieldFormatter.format("1")).thenReturn("1");
+        when(csvFieldFormatter.format("HR")).thenReturn("HR");
+        when(csvFieldFormatter.format(new BigDecimal("5000"))).thenReturn("5000");
 
         csvRowWriterService.writeRow(fields, employee);
 
-        var expectedRowLine = new StringJoiner(",")
-                .add("1")
-                .add("HR")
-                .add("5000")
-                .toString();
+        String expectedRowLine = String.join(",", "1", "HR", "5000");
         verify(bufferedWriter).write(expectedRowLine);
         verify(bufferedWriter).newLine();
     }
@@ -104,31 +98,26 @@ public class CsvRowWriterServiceImplTest {
         Person person = new Person("John", "Doe", 15, Months.JANUARY, 1990);
         person.setId("1");
 
-        mockedStaticValidator.when(() -> CsvFieldValidator.isValidField(any(Field.class)))
-                .thenReturn(true);
-        mockedStaticReflectionUtil.when(() -> CsvReflectionUtil.getFieldValue(any(CsvModel.class), any(Field.class)))
-                .thenAnswer(invocation -> {
-                    Field field = invocation.getArgument(1);
-                    field.setAccessible(true);
-                    return field.get(person);
-                });
-        when(csvFieldFormatter.format(any())).thenAnswer(invocation -> {
-            var argument = invocation.getArgument(0);
-            return argument != null ?
-                    argument.toString() :
-                    "";
-        });
+        for (Field field : fields) {
+            mockedStaticValidator.when(() -> CsvFieldValidator.isValidField(field))
+                    .thenReturn(true);
+            mockedStaticReflectionUtil.when(() -> CsvReflectionUtil.getFieldValue(person, field))
+                    .thenAnswer(invocation -> {
+                        field.setAccessible(true);
+                        return field.get(person);
+                    });
+        }
+
+        when(csvFieldFormatter.format("1")).thenReturn("1");
+        when(csvFieldFormatter.format("John")).thenReturn("John");
+        when(csvFieldFormatter.format("Doe")).thenReturn("Doe");
+        when(csvFieldFormatter.format(15)).thenReturn("15");
+        when(csvFieldFormatter.format(Months.JANUARY)).thenReturn("JANUARY");
+        when(csvFieldFormatter.format(1990)).thenReturn("1990");
 
         csvRowWriterService.writeRow(fields, person);
 
-        var expectedRowLine = new StringJoiner(",")
-                .add("1")
-                .add("John")
-                .add("Doe")
-                .add("15")
-                .add("JANUARY")
-                .add("1990")
-                .toString();
+        String expectedRowLine = String.join(",", "1", "John", "Doe", "15", "JANUARY", "1990");
         verify(bufferedWriter).write(expectedRowLine);
         verify(bufferedWriter).newLine();
     }
@@ -139,28 +128,23 @@ public class CsvRowWriterServiceImplTest {
         Student student = new Student("Alice", List.of("90", "85"));
         student.setId("1");
 
-        mockedStaticValidator.when(() -> CsvFieldValidator.isValidField(any(Field.class)))
-                .thenReturn(true);
-        mockedStaticReflectionUtil.when(() -> CsvReflectionUtil.getFieldValue(any(CsvModel.class), any(Field.class)))
-                .thenAnswer(invocation -> {
-                    Field field = invocation.getArgument(1);
-                    field.setAccessible(true);
-                    return field.get(student);
-                });
-        when(csvFieldFormatter.format(any())).thenAnswer(invocation -> {
-            var argument = invocation.getArgument(0);
-            return argument != null ?
-                    argument.toString() :
-                    "";
-        });
+        for (Field field : fields) {
+            mockedStaticValidator.when(() -> CsvFieldValidator.isValidField(field))
+                    .thenReturn(true);
+            mockedStaticReflectionUtil.when(() -> CsvReflectionUtil.getFieldValue(student, field))
+                    .thenAnswer(invocation -> {
+                        field.setAccessible(true);
+                        return field.get(student);
+                    });
+        }
+
+        when(csvFieldFormatter.format("1")).thenReturn("1");
+        when(csvFieldFormatter.format("Alice")).thenReturn("Alice");
+        when(csvFieldFormatter.format(List.of("90", "85"))).thenReturn("[90, 85]");
 
         csvRowWriterService.writeRow(fields, student);
 
-        var expectedRowLine = new StringJoiner(",")
-                .add("1")
-                .add("Alice")
-                .add("[90, 85]")
-                .toString();
+        String expectedRowLine = String.join(",", "1", "Alice", "[90, 85]");
         verify(bufferedWriter).write(expectedRowLine);
         verify(bufferedWriter).newLine();
     }
@@ -171,27 +155,40 @@ public class CsvRowWriterServiceImplTest {
         Employee employee = new Employee("HR", new BigDecimal("5000"));
         employee.setId("1");
 
-        mockedStaticValidator.when(() -> CsvFieldValidator.isValidField(any(Field.class)))
-                .thenReturn(true);
-        mockedStaticReflectionUtil.when(() -> CsvReflectionUtil.getFieldValue(any(CsvModel.class), any(Field.class)))
-                .thenAnswer(invocation -> {
-                    Field field = invocation.getArgument(1);
-                    field.setAccessible(true);
-                    return field.get(employee);
-                });
-        when(csvFieldFormatter.format(any())).thenAnswer(invocation -> {
-            var argument = invocation.getArgument(0);
-            return argument != null ?
-                    argument.toString() :
-                    "";
-        });
+        for (Field field : fields) {
+            mockedStaticValidator.when(() -> CsvFieldValidator.isValidField(field))
+                    .thenReturn(true);
+            mockedStaticReflectionUtil.when(() -> CsvReflectionUtil.getFieldValue(employee, field))
+                    .thenAnswer(invocation -> {
+                        field.setAccessible(true);
+                        return field.get(employee);
+                    });
+        }
 
-        doThrow(new IOException("Test exception")).when(bufferedWriter)
-                .write(any(String.class));
+        when(csvFieldFormatter.format("1")).thenReturn("1");
+        when(csvFieldFormatter.format("HR")).thenReturn("HR");
+        when(csvFieldFormatter.format(new BigDecimal("5000"))).thenReturn("5000");
 
-        csvRowWriterService.writeRow(fields, employee);
+        IOException testException = new IOException("Test exception");
+        CsvFileWriteException mockCsvFileWriteException = mock(CsvFileWriteException.class);
 
-        verify(csvErrorHandler).handleError(any(String.class), any(IOException.class), eq(CsvFileWriteException.class));
+        doThrow(testException).when(bufferedWriter)
+                .write("1,HR,5000");
+
+        doThrow(mockCsvFileWriteException).when(csvErrorHandler)
+                .handleError(
+                        eq("Error writing CSV row"),
+                        eq(testException),
+                        eq(CsvFileWriteException.class)
+                );
+
+        assertThrows(CsvFileWriteException.class, () -> csvRowWriterService.writeRow(fields, employee));
+
+        verify(csvErrorHandler).handleError(
+                eq("Error writing CSV row"),
+                eq(testException),
+                eq(CsvFileWriteException.class)
+        );
     }
 
     private List<Field> getFields(Class<?> clazz, String... fieldNames) throws NoSuchFieldException {
@@ -212,7 +209,8 @@ public class CsvRowWriterServiceImplTest {
             }
         }
         if (clazz != null) {
-            throw new NoSuchFieldException("Field '" + fieldName + "' not found in class hierarchy of " + clazz.getName());
+            throw new NoSuchFieldException(
+                    "Field '" + fieldName + "' not found in class hierarchy of " + clazz.getName());
         } else {
             throw new NoSuchFieldException("Field '" + fieldName + "' not found and class is null");
         }

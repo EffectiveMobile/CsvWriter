@@ -73,7 +73,8 @@ public class Main {
             log.info(result);
 
         } catch (IOException ex) {
-            errorHandler.handleError("Failed to write data to file: " + fileName, ex, CsvFileWriteException.class);
+            throw errorHandler.handleError("Failed to write data to file: " + fileName, ex,
+                    CsvFileWriteException.class);
         }
     }
 

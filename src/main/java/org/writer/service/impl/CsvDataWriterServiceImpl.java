@@ -72,7 +72,7 @@ public class CsvDataWriterServiceImpl implements CsvDataWriterService {
             csvWriterToFileService.writeToFile(data, fileName);
             log.info("CSV file generated successfully: {}", fileName);
         } catch (CsvDataException | CsvFileWriteException | CsvUnexpectedException ex) {
-            csvErrorHandler.handleError("Error generating CSV file: " + fileName, ex, CsvWriterException.class);
+            throw csvErrorHandler.handleError("Error generating CSV file: " + fileName, ex, CsvWriterException.class);
         }
     }
 }
