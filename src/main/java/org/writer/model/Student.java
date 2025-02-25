@@ -7,6 +7,9 @@ import org.writer.annotation.CsvColumn;
 
 import java.util.List;
 
+/**
+ * Класс, представляющий студента.
+ */
 @Data
 @Builder
 @AllArgsConstructor

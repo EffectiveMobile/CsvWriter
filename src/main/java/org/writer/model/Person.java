@@ -5,6 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import org.writer.annotation.CsvColumn;
 
+/**
+ * Класс, представляющий человека.
+ */
 @Data
 @Builder
 @AllArgsConstructor
