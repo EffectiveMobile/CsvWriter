@@ -10,7 +10,7 @@
 
 1. Склонируйте репозиторий:
    ```bash
-   git clone <your-repo-url>
+   git clone https://github.com/Flawden/CsvWriter
    
 2. Убедитесь, что Maven установлен
    ```bash
