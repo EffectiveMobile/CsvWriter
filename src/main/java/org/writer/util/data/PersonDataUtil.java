@@ -1,50 +1,50 @@
 package org.writer.util.data;
 
 import lombok.experimental.UtilityClass;
-import org.writer.model.CsvModel;
+import net.datafaker.Faker;
 import org.writer.model.Person;
 import org.writer.model.enums.Months;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 /**
  * Utility class for generating sample person data.
- * Provides a static method to retrieve a list of {@link Person} objects for testing or demonstration purposes.
  */
 @UtilityClass
 public class PersonDataUtil {
+    private static final Faker FAKER = new Faker();
+    private static final List<Months> MONTHS = List.of(Months.values());
+    private static final int MIN_BIRTH_YEAR = 1970;
+    private static final int MAX_BIRTH_YEAR = 2005;
+    private static final int MIN_BIRTH_DAY = 1;
+    private static final int MAX_BIRTH_DAY = 28;
 
     /**
-     * Returns a list of sample person data.
+     * Generates a list of people with random data.
      *
-     * @return a list of {@link Person} objects.
+     * @param count the number of people to generate
+     * @return a list of {@link Person} objects
      */
-    public static List<CsvModel> getPeople() {
-        return List.of(
-                Person.builder()
-                        .id("P1")
-                        .firstName("John")
-                        .lastName("Doe")
-                        .dayOfBirth(15)
-                        .monthOfBirth(Months.JANUARY)
-                        .yearOfBirth(1990)
-                        .build(),
-                Person.builder()
-                        .id("P2")
-                        .firstName("Jane")
-                        .lastName("Smith")
-                        .dayOfBirth(20)
-                        .monthOfBirth(Months.MARCH)
-                        .yearOfBirth(1985)
-                        .build(),
-                Person.builder()
-                        .id("P3")
-                        .firstName("Alice")
-                        .lastName("Johnson")
-                        .dayOfBirth(10)
-                        .monthOfBirth(Months.SEPTEMBER)
-                        .yearOfBirth(1995)
-                        .build()
-        );
+    public static List<Person> getPeople(int count) {
+        return IntStream.range(0, count)
+                .mapToObj(i -> Person.builder()
+                        .firstName(FAKER.name().firstName())
+                        .lastName(FAKER.name().lastName())
+                        .dayOfBirth(FAKER.number().numberBetween(MIN_BIRTH_DAY, MAX_BIRTH_DAY + 1))
+                        .monthOfBirth(generateMonth())
+                        .yearOfBirth(FAKER.number().numberBetween(MIN_BIRTH_YEAR, MAX_BIRTH_YEAR + 1))
+                        .build())
+                .toList();
+    }
+
+    /**
+     * Selects a random birth month.
+     *
+     * @return a randomly selected {@link Months} enum value
+     */
+    private static Months generateMonth() {
+        return FAKER.options()
+                .nextElement(MONTHS);
     }
 }

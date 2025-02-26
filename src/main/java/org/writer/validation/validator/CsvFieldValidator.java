@@ -5,8 +5,7 @@ import org.writer.validation.annotation.ValidCsvField;
 import java.lang.reflect.Field;
 
 /**
- * Class for validating fields annotated with {@link ValidCsvField}.
- * Provides methods to check if a field is valid for CSV processing.
+ * Class for validating and retrieving header names of fields annotated with {@link ValidCsvField}.
  */
 public class CsvFieldValidator {
 
@@ -18,5 +17,22 @@ public class CsvFieldValidator {
      */
     public static boolean isValidField(Field field) {
         return field.isAnnotationPresent(ValidCsvField.class);
+    }
+
+    /**
+     * Retrieves the header name for a given field.
+     * Uses the custom header name from {@link ValidCsvField} if provided, otherwise defaults to the field name.
+     *
+     * @param field the field to retrieve the header for.
+     * @return the header name for the CSV file.
+     */
+    public static String getFieldHeader(Field field) {
+        var annotation = field.getAnnotation(ValidCsvField.class);
+
+        return (annotation != null && !annotation.headerName().isBlank())
+                ?
+                annotation.headerName()
+                :
+                field.getName();
     }
 }

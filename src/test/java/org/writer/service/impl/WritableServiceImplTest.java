@@ -12,14 +12,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.writer.exception.CsvDataException;
 import org.writer.exception.CsvUnexpectedException;
 import org.writer.exception.handler.CsvErrorHandler;
-import org.writer.model.CsvModel;
 import org.writer.model.Employee;
 import org.writer.service.CsvHeaderWriterService;
 import org.writer.service.CsvRowWriterService;
 import org.writer.util.CsvReflectionUtil;
+import org.writer.util.data.EmployeeDataUtil;
 
 import java.lang.reflect.Field;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +30,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-public class CsvWriterToFileServiceImplTest {
+public class WritableServiceImplTest {
 
     @Mock
     private CsvErrorHandler csvErrorHandler;
@@ -43,7 +42,7 @@ public class CsvWriterToFileServiceImplTest {
     private CsvHeaderWriterService csvHeaderWriterService;
 
     @InjectMocks
-    private CsvWriterToFileServiceImpl csvWriterToFileService;
+    private WritableServiceImpl csvWriterToFileService;
 
     private MockedStatic<CsvReflectionUtil> mockedStaticReflectionUtil;
 
@@ -59,14 +58,11 @@ public class CsvWriterToFileServiceImplTest {
 
     @Test
     public void testWriteToFileSuccess() throws NoSuchFieldException {
-        Employee employee1 = new Employee("HR", new BigDecimal("5000"));
-        employee1.setId("1");
-        Employee employee2 = new Employee("Finance", new BigDecimal("6000"));
-        employee2.setId("2");
+        Employee firstRandomEmployee = EmployeeDataUtil.getEmployees(4).get(0);
+        Employee secondRandomEmployee = EmployeeDataUtil.getEmployees(4).get(1);
 
-        List<Employee> employees = List.of(employee1, employee2);
+        List<Employee> employees = List.of(firstRandomEmployee, secondRandomEmployee);
         List<Field> fields = List.of(
-                CsvModel.class.getDeclaredField("id"),
                 Employee.class.getDeclaredField("department"),
                 Employee.class.getDeclaredField("salary")
         );
@@ -77,29 +73,26 @@ public class CsvWriterToFileServiceImplTest {
         csvWriterToFileService.writeToFile(employees, "test.csv");
 
         verify(csvHeaderWriterService).writeHeaders(fields);
-        verify(csvRowWriterService).writeRow(fields, employee1);
-        verify(csvRowWriterService).writeRow(fields, employee2);
+        verify(csvRowWriterService).writeRow(fields, firstRandomEmployee);
+        verify(csvRowWriterService).writeRow(fields, secondRandomEmployee);
     }
 
     @Test
     public void testWriteToFileWithException() throws NoSuchFieldException {
-        Employee employee1 = new Employee("HR", new BigDecimal("5000"));
-        employee1.setId("1");
-        Employee employee2 = new Employee("Finance", new BigDecimal("6000"));
-        employee2.setId("2");
+        Employee firstRandomEmployee = EmployeeDataUtil.getEmployees(4).get(0);
+        Employee secondRandomEmployee = EmployeeDataUtil.getEmployees(4).get(1);
 
         List<Field> fields = List.of(
-                CsvModel.class.getDeclaredField("id"),
                 Employee.class.getDeclaredField("department"),
                 Employee.class.getDeclaredField("salary")
         );
 
-        List<Employee> employees = List.of(employee1, employee2);
+        List<Employee> employees = List.of(firstRandomEmployee, secondRandomEmployee);
 
         mockedStaticReflectionUtil.when(() -> CsvReflectionUtil.getAllFields(Employee.class))
                 .thenReturn(fields);
 
-        RuntimeException testException = new RuntimeException("Test exception");
+        var testException = new RuntimeException("Test exception");
 
         doThrow(testException).when(csvRowWriterService)
                 .writeRow(eq(fields), argThat(obj -> obj instanceof Employee));
@@ -125,10 +118,21 @@ public class CsvWriterToFileServiceImplTest {
     public void testWriteToFileWithEmptyData() {
         List<Employee> employees = new ArrayList<>();
 
-        try {
-            csvWriterToFileService.writeToFile(employees, "test.csv");
-        } catch (CsvDataException e) {
-            assertEquals("Data list is empty or null", e.getMessage());
-        }
+        var exception = assertThrows(CsvDataException.class, () ->
+                csvWriterToFileService.writeToFile(employees, "test.csv")
+        );
+
+        assertEquals("Data list is null or empty. Provided data: []", exception.getMessage());
+    }
+
+    @Test
+    public void testWriteToFileWithEmptyFilename() {
+        List<Employee> employees = EmployeeDataUtil.getEmployees(4);
+
+        var exception = assertThrows(CsvDataException.class, () ->
+                csvWriterToFileService.writeToFile(employees, "")
+        );
+
+        assertEquals("Filename is null or empty. Provided filename: ''", exception.getMessage());
     }
 }

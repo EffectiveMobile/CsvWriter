@@ -15,14 +15,15 @@ import org.writer.formatter.CsvFieldFormatter;
 import org.writer.model.Employee;
 import org.writer.model.Person;
 import org.writer.model.Student;
-import org.writer.model.enums.Months;
 import org.writer.util.CsvReflectionUtil;
+import org.writer.util.data.EmployeeDataUtil;
+import org.writer.util.data.PersonDataUtil;
+import org.writer.util.data.StudentDataUtil;
 import org.writer.validation.validator.CsvFieldValidator;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,9 +67,8 @@ public class CsvRowWriterServiceImplTest {
 
     @Test
     public void testWriteRowForEmployeeSuccess() throws IOException, NoSuchFieldException {
-        List<Field> fields = getFields(Employee.class, "id", "department", "salary");
-        Employee employee = new Employee("HR", new BigDecimal("5000"));
-        employee.setId("1");
+        List<Field> fields = getFields(Employee.class, "department", "salary");
+        var employee = EmployeeDataUtil.getEmployees(3).get(0);
 
         for (Field field : fields) {
             mockedStaticValidator.when(() -> CsvFieldValidator.isValidField(field))
@@ -80,23 +80,21 @@ public class CsvRowWriterServiceImplTest {
                     });
         }
 
-        when(csvFieldFormatter.format("1")).thenReturn("1");
-        when(csvFieldFormatter.format("HR")).thenReturn("HR");
-        when(csvFieldFormatter.format(new BigDecimal("5000"))).thenReturn("5000");
+        when(csvFieldFormatter.format(employee.getDepartment())).thenReturn(employee.getDepartment());
+        when(csvFieldFormatter.format(employee.getSalary())).thenReturn(employee.getSalary().toString());
 
         csvRowWriterService.writeRow(fields, employee);
 
-        String expectedRowLine = String.join(",", "1", "HR", "5000");
+        String expectedRowLine = String.join(",", employee.getDepartment(), employee.getSalary().toString());
         verify(bufferedWriter).write(expectedRowLine);
         verify(bufferedWriter).newLine();
     }
 
     @Test
     public void testWriteRowForPersonSuccess() throws IOException, NoSuchFieldException {
-        List<Field> fields = getFields(Person.class, "id", "firstName", "lastName", "dayOfBirth", "monthOfBirth",
+        List<Field> fields = getFields(Person.class, "firstName", "lastName", "dayOfBirth", "monthOfBirth",
                 "yearOfBirth");
-        Person person = new Person("John", "Doe", 15, Months.JANUARY, 1990);
-        person.setId("1");
+        var person = PersonDataUtil.getPeople(4).get(0);
 
         for (Field field : fields) {
             mockedStaticValidator.when(() -> CsvFieldValidator.isValidField(field))
@@ -108,25 +106,25 @@ public class CsvRowWriterServiceImplTest {
                     });
         }
 
-        when(csvFieldFormatter.format("1")).thenReturn("1");
-        when(csvFieldFormatter.format("John")).thenReturn("John");
-        when(csvFieldFormatter.format("Doe")).thenReturn("Doe");
-        when(csvFieldFormatter.format(15)).thenReturn("15");
-        when(csvFieldFormatter.format(Months.JANUARY)).thenReturn("JANUARY");
-        when(csvFieldFormatter.format(1990)).thenReturn("1990");
+        when(csvFieldFormatter.format(person.getFirstName())).thenReturn(person.getFirstName());
+        when(csvFieldFormatter.format(person.getLastName())).thenReturn(person.getLastName());
+        when(csvFieldFormatter.format(person.getDayOfBirth())).thenReturn(String.valueOf(person.getDayOfBirth()));
+        when(csvFieldFormatter.format(person.getMonthOfBirth())).thenReturn(person.getMonthOfBirth().toString());
+        when(csvFieldFormatter.format(person.getYearOfBirth())).thenReturn(String.valueOf(person.getYearOfBirth()));
 
         csvRowWriterService.writeRow(fields, person);
 
-        String expectedRowLine = String.join(",", "1", "John", "Doe", "15", "JANUARY", "1990");
+        String expectedRowLine = String.join(",", person.getFirstName(), person.getLastName(),
+                String.valueOf(person.getDayOfBirth()), person.getMonthOfBirth().toString(),
+                String.valueOf(person.getYearOfBirth()));
         verify(bufferedWriter).write(expectedRowLine);
         verify(bufferedWriter).newLine();
     }
 
     @Test
     public void testWriteRowForStudentSuccess() throws IOException, NoSuchFieldException {
-        List<Field> fields = getFields(Student.class, "id", "name", "score");
-        Student student = new Student("Alice", List.of("90", "85"));
-        student.setId("1");
+        List<Field> fields = getFields(Student.class, "name", "score");
+        var student = StudentDataUtil.getStudents(5).get(0);
 
         for (Field field : fields) {
             mockedStaticValidator.when(() -> CsvFieldValidator.isValidField(field))
@@ -138,22 +136,20 @@ public class CsvRowWriterServiceImplTest {
                     });
         }
 
-        when(csvFieldFormatter.format("1")).thenReturn("1");
-        when(csvFieldFormatter.format("Alice")).thenReturn("Alice");
-        when(csvFieldFormatter.format(List.of("90", "85"))).thenReturn("[90, 85]");
+        when(csvFieldFormatter.format(student.getName())).thenReturn(student.getName());
+        when(csvFieldFormatter.format(student.getScore())).thenReturn(student.getScore().toString());
 
         csvRowWriterService.writeRow(fields, student);
 
-        String expectedRowLine = String.join(",", "1", "Alice", "[90, 85]");
+        String expectedRowLine = String.join(",", student.getName(), student.getScore().toString());
         verify(bufferedWriter).write(expectedRowLine);
         verify(bufferedWriter).newLine();
     }
 
     @Test
     public void testWriteRowWithIOException() throws IOException, NoSuchFieldException {
-        List<Field> fields = getFields(Employee.class, "id", "department", "salary");
-        Employee employee = new Employee("HR", new BigDecimal("5000"));
-        employee.setId("1");
+        List<Field> fields = getFields(Employee.class, "department", "salary");
+        var employee = EmployeeDataUtil.getEmployees(3).get(0);
 
         for (Field field : fields) {
             mockedStaticValidator.when(() -> CsvFieldValidator.isValidField(field))
@@ -165,15 +161,14 @@ public class CsvRowWriterServiceImplTest {
                     });
         }
 
-        when(csvFieldFormatter.format("1")).thenReturn("1");
-        when(csvFieldFormatter.format("HR")).thenReturn("HR");
-        when(csvFieldFormatter.format(new BigDecimal("5000"))).thenReturn("5000");
+        when(csvFieldFormatter.format(employee.getDepartment())).thenReturn(employee.getDepartment());
+        when(csvFieldFormatter.format(employee.getSalary())).thenReturn(employee.getSalary().toString());
 
-        IOException testException = new IOException("Test exception");
-        CsvFileWriteException mockCsvFileWriteException = mock(CsvFileWriteException.class);
+        var testException = new IOException("Test exception");
+        var mockCsvFileWriteException = mock(CsvFileWriteException.class);
 
         doThrow(testException).when(bufferedWriter)
-                .write("1,HR,5000");
+                .write(employee.getDepartment() + "," + employee.getSalary());
 
         doThrow(mockCsvFileWriteException).when(csvErrorHandler)
                 .handleError(
@@ -193,6 +188,7 @@ public class CsvRowWriterServiceImplTest {
 
     private List<Field> getFields(Class<?> clazz, String... fieldNames) throws NoSuchFieldException {
         List<Field> fields = new ArrayList<>();
+
         for (String fieldName : fieldNames) {
             fields.add(getFieldFromClassHierarchy(clazz, fieldName));
         }
@@ -201,6 +197,7 @@ public class CsvRowWriterServiceImplTest {
 
     private Field getFieldFromClassHierarchy(Class<?> clazz, String fieldName) throws NoSuchFieldException {
         Class<?> currentClass = clazz;
+
         while (currentClass != null) {
             try {
                 return currentClass.getDeclaredField(fieldName);
@@ -208,6 +205,7 @@ public class CsvRowWriterServiceImplTest {
                 currentClass = currentClass.getSuperclass();
             }
         }
+
         if (clazz != null) {
             throw new NoSuchFieldException(
                     "Field '" + fieldName + "' not found in class hierarchy of " + clazz.getName());

@@ -1,7 +1,5 @@
 package org.writer.service;
 
-import org.writer.model.CsvModel;
-
 import java.lang.reflect.Field;
 import java.util.List;
 
@@ -16,5 +14,5 @@ public interface CsvRowWriterService {
      * @param fields the list of fields to include in the row.
      * @param object the data object to write as a row.
      */
-    void writeRow(List<Field> fields, CsvModel object);
+    void writeRow(List<Field> fields, Object object);
 }

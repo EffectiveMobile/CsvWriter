@@ -56,16 +56,19 @@ public class CsvHeaderWriterServiceImplTest {
 
     @Test
     public void testWriteHeadersForEmployeeSuccess() throws IOException, NoSuchFieldException {
-        List<Field> fields = getFields(Employee.class, "id", "department", "salary");
+        List<Field> fields = getFields(Employee.class, "department", "salary");
 
         for (Field field : fields) {
             mockedStatic.when(() -> CsvFieldValidator.isValidField(eq(field)))
                     .thenReturn(true);
+
+            mockedStatic.when(() -> CsvFieldValidator.getFieldHeader(eq(field)))
+                    .thenReturn(field.getName());
         }
 
         csvHeaderWriterService.writeHeaders(fields);
 
-        String expectedHeaderLine = "id,department,salary";
+        String expectedHeaderLine = "department,salary";
 
         verify(bufferedWriter).write(eq(expectedHeaderLine));
         verify(bufferedWriter).newLine();
@@ -73,17 +76,20 @@ public class CsvHeaderWriterServiceImplTest {
 
     @Test
     public void testWriteHeadersForPersonSuccess() throws IOException, NoSuchFieldException {
-        List<Field> fields = getFields(Person.class, "id", "firstName", "lastName", "dayOfBirth", "monthOfBirth",
+        List<Field> fields = getFields(Person.class, "firstName", "lastName", "dayOfBirth", "monthOfBirth",
                 "yearOfBirth");
 
         for (Field field : fields) {
             mockedStatic.when(() -> CsvFieldValidator.isValidField(eq(field)))
                     .thenReturn(true);
+
+            mockedStatic.when(() -> CsvFieldValidator.getFieldHeader(eq(field)))
+                    .thenReturn(field.getName());
         }
 
         csvHeaderWriterService.writeHeaders(fields);
 
-        String expectedHeaderLine = "id,firstName,lastName,dayOfBirth,monthOfBirth,yearOfBirth";
+        String expectedHeaderLine = "firstName,lastName,dayOfBirth,monthOfBirth,yearOfBirth";
 
         verify(bufferedWriter).write(eq(expectedHeaderLine));
         verify(bufferedWriter).newLine();
@@ -91,16 +97,19 @@ public class CsvHeaderWriterServiceImplTest {
 
     @Test
     public void testWriteHeadersForStudentSuccess() throws IOException, NoSuchFieldException {
-        List<Field> fields = getFields(Student.class, "id", "name", "score");
+        List<Field> fields = getFields(Student.class, "name", "score");
 
         for (Field field : fields) {
             mockedStatic.when(() -> CsvFieldValidator.isValidField(eq(field)))
                     .thenReturn(true);
+
+            mockedStatic.when(() -> CsvFieldValidator.getFieldHeader(eq(field)))
+                    .thenReturn(field.getName());
         }
 
         csvHeaderWriterService.writeHeaders(fields);
 
-        String expectedHeaderLine = "id,name,score";
+        String expectedHeaderLine = "name,score";
 
         verify(bufferedWriter).write(eq(expectedHeaderLine));
         verify(bufferedWriter).newLine();
@@ -108,17 +117,20 @@ public class CsvHeaderWriterServiceImplTest {
 
     @Test
     public void testWriteHeadersWithIOException() throws IOException, NoSuchFieldException {
-        List<Field> fields = getFields(Employee.class, "id", "department", "salary");
+        List<Field> fields = getFields(Employee.class, "department", "salary");
 
         for (Field field : fields) {
             mockedStatic.when(() -> CsvFieldValidator.isValidField(eq(field)))
                     .thenReturn(true);
+
+            mockedStatic.when(() -> CsvFieldValidator.getFieldHeader(eq(field)))
+                    .thenReturn(field.getName());
         }
 
-        String expectedHeaderLine = "id,department,salary";
-        IOException testException = new IOException("Test exception");
+        String expectedHeaderLine = "department,salary";
+        var testException = new IOException("Test exception");
 
-        CsvFileWriteException mockException = mock(CsvFileWriteException.class);
+        var mockException = mock(CsvFileWriteException.class);
 
         doThrow(testException).when(bufferedWriter)
                 .write(eq(expectedHeaderLine));

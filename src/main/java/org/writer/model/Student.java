@@ -1,31 +1,24 @@
 package org.writer.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
-import lombok.experimental.SuperBuilder;
-import org.writer.annotation.CsvFieldOrder;
 import org.writer.validation.annotation.ValidCsvField;
 
 import java.util.List;
 
 /**
  * Represents a student entity.
- * Extends {@link CsvModel} and includes student-specific details such as name and scores.
+ * Includes student-specific details such as name and scores.
  */
 @Data
-@ToString(callSuper = true)
-@SuperBuilder
-@EqualsAndHashCode(callSuper = true)
+@Builder
 @AllArgsConstructor
-public class Student extends CsvModel {
+public class Student {
 
     @ValidCsvField
-    @CsvFieldOrder(2)
     private String name;
 
     @ValidCsvField
-    @CsvFieldOrder(3)
     private List<String> score;
 }

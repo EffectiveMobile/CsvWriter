@@ -1,40 +1,46 @@
 package org.writer.util.data;
 
 import lombok.experimental.UtilityClass;
-import org.writer.model.CsvModel;
+import net.datafaker.Faker;
 import org.writer.model.Student;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 /**
  * Utility class for generating sample student data.
- * Provides a static method to retrieve a list of {@link Student} objects for testing or demonstration purposes.
  */
 @UtilityClass
 public class StudentDataUtil {
+    private static final Faker FAKER = new Faker();
+    private static final int MIN_SCORE = 60;
+    private static final int MAX_SCORE = 100;
+    private static final int SCORES_COUNT = 3;
 
     /**
-     * Returns a list of sample student data.
+     * Generates a list of students with random data.
      *
-     * @return a list of {@link Student} objects.
+     * @param count the number of students to generate
+     * @return a list of {@link Student} objects
      */
-    public static List<CsvModel> getStudents() {
-        return List.of(
-                Student.builder()
-                        .id("S1")
-                        .name("Anna")
-                        .score(List.of("95", "87", "92"))
-                        .build(),
-                Student.builder()
-                        .id("S2")
-                        .name("Dmitry")
-                        .score(List.of("88", "91", "89"))
-                        .build(),
-                Student.builder()
-                        .id("S3")
-                        .name("Ekaterina")
-                        .score(List.of("78", "82", "85"))
-                        .build()
-        );
+    public static List<Student> getStudents(int count) {
+        return IntStream.range(0, count)
+                .mapToObj(i -> Student.builder()
+                        .name(FAKER.name().firstName())
+                        .score(generateScores())
+                        .build())
+                .toList();
+    }
+
+    /**
+     * Generates a list of random scores for a student.
+     *
+     * @return a list of scores as strings
+     */
+    private static List<String> generateScores() {
+        return IntStream.range(0, SCORES_COUNT)
+                .mapToObj(i -> String.valueOf(FAKER.number()
+                        .numberBetween(MIN_SCORE, MAX_SCORE + 1)))
+                .toList();
     }
 }

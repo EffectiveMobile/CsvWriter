@@ -15,7 +15,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class CsvErrorHandlerTest {
-
     private CsvErrorHandler errorHandler;
     private TestLogger testLogger;
 

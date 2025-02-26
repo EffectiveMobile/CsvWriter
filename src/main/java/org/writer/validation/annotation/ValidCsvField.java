@@ -7,11 +7,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marks a field as valid for inclusion in CSV processing.
- * Fields annotated with this annotation are considered valid and can be processed during CSV operations.
+ * Marks a field for CSV processing with an optional custom header name.
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface ValidCsvField {
+    String headerName() default "";
 }

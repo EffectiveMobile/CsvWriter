@@ -18,8 +18,8 @@ public class CsvReflectionUtilTest {
     private static final Random random = new Random();
 
     private static class TestClass {
-        private static final String field1 = "test" + random.nextInt(1000);
-        private static final int field2 = random.nextInt(1000);
+        private static final String stringTestField = "test" + random.nextInt(1000);
+        private static final int intTestField = random.nextInt(1000);
     }
 
     private TestClass testObject;
@@ -37,9 +37,8 @@ public class CsvReflectionUtilTest {
         assertEquals(2, fields.size(), "The fields list size should be 2");
 
         for (Field field : fields) {
-            assertTrue(field.getName()
-                            .equals("field1") || field.getName()
-                            .equals("field2"),
+            assertTrue(field.getName().equals("stringTestField") ||
+                            field.getName().equals("intTestField"),
                     "Field names should be 'field1' or 'field2'");
         }
     }
@@ -47,21 +46,23 @@ public class CsvReflectionUtilTest {
     @Test
     public void testGetFieldValueSuccess() {
         try {
-            var field1 = TestClass.class.getDeclaredField("field1");
-            field1.setAccessible(true);
-            var fieldValue1 = CsvReflectionUtil.getFieldValue(testObject, field1);
+            var stringTestField = TestClass.class.getDeclaredField("stringTestField");
+            stringTestField.setAccessible(true);
+            var firstFieldValue = CsvReflectionUtil.getFieldValue(testObject, stringTestField);
 
-            assertNotNull(fieldValue1, "The value of 'field1' should not be null");
-            assertInstanceOf(String.class, fieldValue1, "The value of 'field1' should be an String");
-            assertEquals(TestClass.field1, fieldValue1, "The value of 'field1' should match the original value");
+            assertNotNull(firstFieldValue, "The value of 'stringTestField' should not be null");
+            assertInstanceOf(String.class, firstFieldValue, "The value of 'stringTestField' should be an String");
+            assertEquals(TestClass.stringTestField, firstFieldValue,
+                    "The value of 'stringTestField' should match the original value");
 
-            var field2 = TestClass.class.getDeclaredField("field2");
-            field2.setAccessible(true);
-            var fieldValue2 = CsvReflectionUtil.getFieldValue(testObject, field2);
+            var intTestField = TestClass.class.getDeclaredField("intTestField");
+            intTestField.setAccessible(true);
+            var secondFieldValue = CsvReflectionUtil.getFieldValue(testObject, intTestField);
 
-            assertNotNull(fieldValue2, "The value of 'field2' should not be null");
-            assertInstanceOf(Integer.class, fieldValue2, "The value of 'field2' should be an integer");
-            assertEquals(TestClass.field2, fieldValue2, "The value of 'field2' should match the original value");
+            assertNotNull(secondFieldValue, "The value of 'intTestField' should not be null");
+            assertInstanceOf(Integer.class, secondFieldValue, "The value of 'intTestField' should be an integer");
+            assertEquals(TestClass.intTestField, secondFieldValue,
+                    "The value of 'intTestField' should match the original value");
 
         } catch (NoSuchFieldException ex) {
             fail("Fields 'field1' and 'field2' should exist and be accessible", ex);

@@ -1,42 +1,32 @@
 package org.writer.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
-import lombok.experimental.SuperBuilder;
-import org.writer.annotation.CsvFieldOrder;
 import org.writer.model.enums.Months;
 import org.writer.validation.annotation.ValidCsvField;
 
 /**
  * Represents a person entity.
- * Extends {@link CsvModel} and includes personal details such as name and date of birth.
+ * Includes personal details such as name and date of birth.
  */
 @Data
-@ToString(callSuper = true)
-@SuperBuilder
-@EqualsAndHashCode(callSuper = true)
+@Builder
 @AllArgsConstructor
-public class Person extends CsvModel {
+public class Person {
 
-    @ValidCsvField
-    @CsvFieldOrder(2)
+    @ValidCsvField(headerName = "First Name")
     private String firstName;
 
-    @ValidCsvField
-    @CsvFieldOrder(3)
+    @ValidCsvField(headerName = "Last Name")
     private String lastName;
 
-    @ValidCsvField
-    @CsvFieldOrder(4)
+    @ValidCsvField(headerName = "Day of birth")
     private int dayOfBirth;
 
-    @ValidCsvField
-    @CsvFieldOrder(5)
+    @ValidCsvField(headerName = "Month of birth")
     private Months monthOfBirth;
 
-    @ValidCsvField
-    @CsvFieldOrder(6)
+    @ValidCsvField(headerName = "Year of birth")
     private int yearOfBirth;
 }

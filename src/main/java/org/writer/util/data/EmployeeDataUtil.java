@@ -1,41 +1,56 @@
 package org.writer.util.data;
 
 import lombok.experimental.UtilityClass;
-import org.writer.model.CsvModel;
+import net.datafaker.Faker;
 import org.writer.model.Employee;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.IntStream;
 
 /**
  * Utility class for generating sample employee data.
- * Provides a static method to retrieve a list of {@link Employee} objects for testing or demonstration purposes.
  */
 @UtilityClass
 public class EmployeeDataUtil {
+    private static final Faker FAKER = new Faker();
+    private static final List<String> DEPARTMENTS = List.of("Engineering", "Marketing", "Sales", "HR", "Finance", "IT");
+    private static final BigDecimal MIN_SALARY = new BigDecimal("50000.00");
+    private static final BigDecimal MAX_SALARY = new BigDecimal("120000.00");
+    private static final int SALARY_SCALE = 2;
 
     /**
-     * Returns a list of sample employee data.
+     * Generates a list of employees with random data.
      *
-     * @return a list of {@link Employee} objects.
+     * @param count the number of employees to generate
+     * @return a list of {@link Employee} objects
      */
-    public static List<CsvModel> getEmployees() {
-        return List.of(
-                Employee.builder()
-                        .id("E1")
-                        .department("Engineering")
-                        .salary(new BigDecimal("75000.00"))
-                        .build(),
-                Employee.builder()
-                        .id("E2")
-                        .department("Marketing")
-                        .salary(new BigDecimal("65000.00"))
-                        .build(),
-                Employee.builder()
-                        .id("E3")
-                        .department("Sales")
-                        .salary(new BigDecimal("70000.00"))
-                        .build()
-        );
+    public static List<Employee> getEmployees(int count) {
+        return IntStream.range(0, count)
+                .mapToObj(i -> Employee.builder()
+                        .department(generateDepartment())
+                        .salary(generateSalary())
+                        .build())
+                .toList();
+    }
+
+    /**
+     * Generates a random salary within the predefined range.
+     *
+     * @return a random salary as {@link BigDecimal}
+     */
+    private static BigDecimal generateSalary() {
+        return BigDecimal.valueOf(FAKER.number()
+                .randomDouble(SALARY_SCALE, MIN_SALARY.intValue(), MAX_SALARY.intValue()));
+    }
+
+    /**
+     * Selects a random department from the predefined list.
+     *
+     * @return a department name as a string
+     */
+    private static String generateDepartment() {
+        return FAKER.options()
+                .nextElement(DEPARTMENTS);
     }
 }
