@@ -17,13 +17,14 @@ repositories {
 dependencies {
     api libs.net.datafaker.datafaker
     testImplementation libs.org.junit.jupiter.junit.jupiter
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
     compileOnly libs.org.projectlombok.lombok
 }
 
 group = 'org.writer'
 version = '1.0-SNAPSHOT'
 description = 'csv'
-java.sourceCompatibility = JavaVersion.VERSION_1_8
+java.sourceCompatibility = JavaVersion.VERSION_17
 
 publishing {
     publications {
