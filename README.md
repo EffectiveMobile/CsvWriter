@@ -1,20 +1,63 @@
-# Практическое задание 1 # CSV Writer
+# CSV Writer
 
-Мы пишем приложение, которое должно генерировать отчеты в разных форматах и нам хочется генерировать какой-нибудь отчёт в CSV, но проблема в том, что у нас нет такого инструмента. Поэтому мы решаем, что нам нужна библиотека для генерации CSV файлов.
-Реализация может быть построена с помощью Reflection и аннотаций.
+Библиотека для генерации CSV-файлов из объектов с использованием рефлексии и аннотаций.
 
-Папка model содержит классы, которые нужно сохранять в CSV. Классы можно изменять и добавлять новые.
+## Описание
 
-**Описание:**<br>
-✅ Написать реализацию Writable, которая будет сохранять объекты в CSV формате в файл<br>
-✅ Написать unit тесты<br>
-✅ Написать JavaDoc<br>
-✅ Для генерации тестовых данных можно использовать Datafaker<br>
-✅ В main должно быть несколько примеров сохранения данных в файл
+Проект реализует интерфейс `Writable` для записи списка объектов в CSV-файл. Поддерживает произвольные классы с полями, помеченными аннотацией `@CsvColumn`, включая коллекции (например, списки оценок в `Student`).
 
-**Как выполнить:**
-1. Сделать форк этого проекта
-2. Сделать ветку dev в своем проекте. Выполнять работу в ней
-3. После выполнения работы открыть Pull Request в master
-4. Назначить ментора ревьювером
-5. Отправить ссылку на PR в тг чат ментору
+## Установка
+
+1. Склонируйте репозиторий:
+   ```bash
+   git clone https://github.com/Flawden/CsvWriter
+   
+2. Убедитесь, что Maven установлен
+   ```bash
+   mvn -v
+
+3. Соберите проект:
+   ```bash
+   mvn clean install
+
+## Использование
+
+1. Создайте класс с полями, помеченными @CsvColumn:
+
+``` 
+@Data
+public class Person {
+    @CsvColumn(order = 0, name = "First Name")
+    private String firstName;
+    @CsvColumn(order = 1, name = "Last Name")
+    private String lastName;
+}
+```
+2. Используйте CsvWriterImpl:
+
+``` 
+CsvWriterImpl csvWriter = new CsvWriterImpl();
+List<Person> people = List.of(new Person("John", "Doe"));
+csvWriter.writeToFile(people, "people.csv");
+``` 
+
+Примеры
+- Запись списка Person в people.csv.
+- Запись списка Student с оценками в students.csv (см. Main.java).
+
+Структура проекта
+
+- src/main/java/org/writer/:
+  - CsvWriterImpl — основная реализация.
+  - Writable — интерфейс.
+- src/main/java/org/writer/model/:
+  - Person, Student, Months — модели данных.
+- src/main/java/org/writer/annotation/:
+  - CsvColumn — аннотация для полей.
+- src/test/java/:
+  - Тесты с Datafaker.
+
+Зависимости
+- Lombok — для упрощения моделей.
+- Datafaker — для генерации тестовых данных.
+- JUnit 5 — для unit-тестов.
