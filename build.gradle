@@ -23,8 +23,13 @@ dependencies {
 
 group = 'org.writer'
 version = '1.0-SNAPSHOT'
-description = 'csv'
-java.sourceCompatibility = JavaVersion.VERSION_17
+description = 'Library for converting data to CSV'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    withSourcesJar()
+    withJavadocJar()
+}
 
 publishing {
     publications {

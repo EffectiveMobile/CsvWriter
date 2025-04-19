@@ -4,7 +4,7 @@
 [versions]
 net-datafaker-datafaker = "2.4.2"
 org-junit-jupiter-junit-jupiter = "5.8.1"
-org-projectlombok-lombok = "1.18.34"
+org-projectlombok-lombok = "1.18.30"
 
 [libraries]
 net-datafaker-datafaker = { module = "net.datafaker:datafaker", version.ref = "net-datafaker-datafaker" }
