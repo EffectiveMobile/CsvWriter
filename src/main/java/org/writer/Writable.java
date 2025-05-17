@@ -1,9 +1,10 @@
 package org.writer;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.List;
 
-public interface Writable {
+public interface Writable extends Closeable {
 
-    void writeToFile(List<?> data, String fileName);
-
+    void write(List<?> data) throws IOException;
 }
