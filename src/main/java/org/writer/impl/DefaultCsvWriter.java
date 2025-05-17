@@ -46,6 +46,21 @@ public class DefaultCsvWriter implements Writable {
         this.lineSeparator = lineSeparator;
     }
 
+    /**
+     * Записывает список объектов (POJO) в CSV формат, используя предоставленный {@link Writer}.
+     * <p>
+     * Метод определяет структуру CSV на основе первого не {@code null} объекта в списке.
+     * Все объекты в списке должны быть одного типа и аннотированы {@link CsvRecord}.
+     * Поля для записи определяются на основе рефлексии и аннотаций {@link CsvColumn},
+     * {@link CsvTransient} и {@link CsvMasked}.
+     * </p>
+     *
+     * @param data Список объектов для записи. Если список {@code null}, пуст, или первый объект {@code null},
+     *             метод не выполняет никаких действий (кроме выброса исключения, если аннотация отсутствует).
+     * @throws IOException                         Если возникает ошибка ввода-вывода во время записи.
+     * @throws CsvRecordAnnotationMissingException Если класс объектов в списке не аннотирован {@link CsvRecord}.
+     * @throws IllegalArgumentException            Если объекты в списке разных типов.
+     */
     @Override
     public void write(List<?> data) throws IOException {
         if (isInvalidData(data)) return;
@@ -64,6 +79,14 @@ public class DefaultCsvWriter implements Writable {
         processDataFields(data, processedFields, clazz);
     }
 
+    /**
+     * Проверяет валидность входного списка данных.
+     *
+     * @param data Список данных для проверки.
+     * @return {@code true}, если данные невалидны ({@code null}, пустые, первый элемент {@code null}),
+     *         {@code false} в противном случае.
+     * @throws CsvRecordAnnotationMissingException если класс первого объекта не аннотирован {@link CsvRecord}.
+     */
     private static boolean isInvalidData(List<?> data) {
         boolean isInvalid = data == null || data.isEmpty() || data.get(0) == null;
         if (isInvalid) return true;
@@ -74,6 +97,15 @@ public class DefaultCsvWriter implements Writable {
         return false;
     }
 
+    /**
+     * Обрабатывает и записывает данные из списка объектов.
+     *
+     * @param data            Список объектов для записи.
+     * @param processedFields Список обработанных полей, определяющих структуру CSV.
+     * @param clazz           Класс объектов в списке.
+     * @throws IOException              Если возникает ошибка ввода-вывода.
+     * @throws IllegalArgumentException Если объект в списке не является экземпляром {@code clazz}.
+     */
     private void processDataFields(List<?> data, List<ProcessedField> processedFields, Class<?> clazz) throws IOException {
         for (Object obj : data) {
             if (obj == null) {
@@ -98,6 +130,13 @@ public class DefaultCsvWriter implements Writable {
         }
     }
 
+    /**
+     * Записывает строку заголовков, если это необходимо.
+     *
+     * @param includeHeader   {@code true}, если заголовок должен быть записан.
+     * @param processedFields Список обработанных полей, из которых формируются заголовки.
+     * @throws IOException Если возникает ошибка ввода-вывода.
+     */
     private void processHeaders(boolean includeHeader, List<ProcessedField> processedFields) throws IOException {
         if (includeHeader) {
             List<String> headers = processedFields.stream()
@@ -107,6 +146,14 @@ public class DefaultCsvWriter implements Writable {
         }
     }
 
+    /**
+     * Записывает одну строку данных (список строковых значений) в CSV.
+     * Экранирует и заключает в кавычки значения при необходимости.
+     *
+     * @param row Список строковых значений для записи в качестве одной строки CSV.
+     *            Если {@code row} равен {@code null}, записывается только разделитель строк.
+     * @throws IOException Если возникает ошибка ввода-вывода.
+     */
     private void writeRowInternal(List<String> row) throws IOException {
         if (row == null) {
             writer.append(lineSeparator);
@@ -121,6 +168,14 @@ public class DefaultCsvWriter implements Writable {
         writer.append(lineSeparator);
     }
 
+    /**
+     * Анализирует поля класса для определения, какие из них должны быть включены в CSV,
+     * и какие имена заголовков им соответствуют.
+     *
+     * @param clazz               Класс для анализа.
+     * @param classNamingStrategy Стратегия именования, применяемая на уровне класса (по умолчанию).
+     * @return Список объектов {@link ProcessedField}, представляющих поля для CSV.
+     */
     private List<ProcessedField> processFields(Class<?> clazz, NamingStrategy classNamingStrategy) {
         List<ProcessedField> tempFields = new ArrayList<>();
         Field[] declaredFields = clazz.getDeclaredFields();
@@ -143,6 +198,13 @@ public class DefaultCsvWriter implements Writable {
         return tempFields;
     }
 
+    /**
+     * Определяет имя заголовка для поля на основе аннотации {@link CsvColumn} и стратегии именования.
+     *
+     * @param field               Поле для определения имени заголовка.
+     * @param fieldNamingStrategy Стратегия именования по умолчанию для этого поля (обычно наследуется от класса).
+     * @return Имя заголовка для поля.
+     */
     private String getHeader(Field field, NamingStrategy fieldNamingStrategy) {
         String headerName;
         CsvColumn csvColumn = field.getAnnotation(CsvColumn.class);
@@ -161,6 +223,13 @@ public class DefaultCsvWriter implements Writable {
         return headerName;
     }
 
+    /**
+     * Применяет указанную стратегию именования к имени поля.
+     *
+     * @param fieldName Имя поля.
+     * @param strategy  Стратегия именования (например, CAMEL_TO_SNAKE_CASE).
+     * @return Имя поля, преобразованное согласно стратегии.
+     */
     private String applyNamingStrategy(String fieldName, NamingStrategy strategy) {
         if (strategy == NamingStrategy.AS_IS_TO_SPACE_SEPARATED_CAPITALIZED) {
             if (fieldName == null || fieldName.isEmpty()) return "";
@@ -186,6 +255,14 @@ public class DefaultCsvWriter implements Writable {
         return fieldName;
     }
 
+    /**
+     * Преобразует значение поля в строку, применяя маскирование, если оно настроено.
+     *
+     * @param value          Значение поля.
+     * @param processedField Информация об обработанном поле, включая аннотацию {@link CsvMasked}.
+     * @return Строковое представление значения поля, возможно, замаскированное.
+     *         Возвращает пустую строку, если {@code value} равно {@code null}.
+     */
     private String convertFieldValueToString(Object value, ProcessedField processedField) {
         if (value == null) {
             return "";
@@ -200,6 +277,14 @@ public class DefaultCsvWriter implements Writable {
         return stringValue;
     }
 
+    /**
+     * Применяет стратегию маскирования к строковому значению.
+     *
+     * @param originalValue Исходное строковое значение.
+     * @param csvMasked     Аннотация {@link CsvMasked} с настройками маскирования.
+     * @return Замаскированное значение или исходное, если маскирование не применимо.
+     *         Возвращает пустую строку, если {@code originalValue} равно {@code null} или пусто.
+     */
     private String applyMasking(String originalValue, CsvMasked csvMasked) {
         if (originalValue == null || originalValue.isEmpty()) return "";
 
@@ -220,6 +305,14 @@ public class DefaultCsvWriter implements Writable {
         };
     }
 
+    /**
+     * Генерирует строку, состоящую из повторяющегося символа.
+     *
+     * @param c     Символ для повторения.
+     * @param times Количество повторений.
+     * @return Строка из {@code times} символов {@code c}.
+     *         Возвращает пустую строку, если {@code times <= 0}.
+     */
     private String repeatChar(char c, int times) {
         if (times <= 0) return "";
         char[] chars = new char[times];
@@ -227,6 +320,13 @@ public class DefaultCsvWriter implements Writable {
         return new String(chars);
     }
 
+    /**
+     * Экранирует специальные символы в значении и заключает его в двойные кавычки, если это необходимо.
+     * Специальные символы включают разделитель, символ новой строки и сами двойные кавычки.
+     *
+     * @param value Строковое значение для экранирования и заключения в кавычки.
+     * @return Обработанное значение. Возвращает пустую строку, если {@code value} равно {@code null}.
+     */
     private String escapeAndQuote(String value) {
         if (value == null) {
             return "";
@@ -252,11 +352,22 @@ public class DefaultCsvWriter implements Writable {
         return result;
     }
 
+    /**
+     * Закрывает используемый {@link Writer}.
+     * Этот метод должен вызываться после завершения всех операций записи,
+     * чтобы освободить системные ресурсы и гарантировать запись всех буферизованных данных.
+     *
+     * @throws IOException Если возникает ошибка ввода-вывода при закрытии {@code Writer}.
+     */
     @Override
     public void close() throws IOException {
         writer.close();
     }
 
+    /**
+     * Внутренний класс для хранения информации об обрабатываемом поле,
+     * включая его имя для заголовка и связанные аннотации.
+     */
     @Getter
     @AllArgsConstructor
     private static class ProcessedField {
