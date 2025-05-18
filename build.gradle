@@ -1,0 +1,52 @@
+
+
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id "org.sonarqube" version "6.0.1.5171"
+}
+
+repositories {
+    mavenLocal()
+    maven {
+        url = uri('https://repo.maven.apache.org/maven2/')
+    }
+}
+
+dependencies {
+    testImplementation libs.org.junit.jupiter.junit.jupiter
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+}
+
+group = 'org.writer'
+version = '1.0-SNAPSHOT'
+description = 'csv'
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from(components.java)
+        }
+    }
+}
+
+tasks.withType(Test) {
+    useJUnitPlatform()
+}
+
+sonarqube {
+    properties {
+        property "sonar.host.url", "http://localhost:9000"
+        property "sonar.projectKey", "sdasdsadas"
+        property "sonar.projectName", "sadsa"
+        property "sonar.java.binaries", "build/classes/java/main"
+        property "sonar.sources", "src/main/java"
+        property "sonar.tests", "src/test/java"
+    }
+}
