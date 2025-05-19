@@ -5,6 +5,11 @@ import org.writer.impl.DefaultCsvWriter;
 
 import java.io.Writer;
 
+/**
+ * Фабрика по созданию CsvWriter
+ *
+ * @author Астонский Шпион
+ */
 @UtilityClass
 public class CsvWriterFactory {
 

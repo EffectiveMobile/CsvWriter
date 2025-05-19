@@ -1,8 +1,8 @@
 package org.writer;
 
 import lombok.AllArgsConstructor;
-import org.writer.annotation.CsvMasked;
-import org.writer.annotation.CsvRecord;
+import org.writer.annotation.MaskedField;
+import org.writer.annotation.csv.CsvRecord;
 import org.writer.annotation.constans.MaskingStrategy;
 import org.writer.model.Client;
 import org.writer.model.Person;
@@ -48,7 +48,7 @@ public class Main {
 
         private String firstName;
         private String lastName;
-        @CsvMasked(strategy = MaskingStrategy.ASTERISKS_PARTIAL_SUFFIX)
+        @MaskedField(strategy = MaskingStrategy.ASTERISKS_PARTIAL_SUFFIX)
         private String accountNumber;
     }
 }

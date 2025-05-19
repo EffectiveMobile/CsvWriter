@@ -3,13 +3,13 @@ package org.writer.impl;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.writer.Writable;
-import org.writer.annotation.CsvColumn;
-import org.writer.annotation.CsvMasked;
-import org.writer.annotation.CsvRecord;
-import org.writer.annotation.CsvTransient;
+import org.writer.annotation.DataField;
+import org.writer.annotation.MaskedField;
+import org.writer.annotation.csv.CsvRecord;
+import org.writer.annotation.TransientField;
 import org.writer.annotation.constans.MaskingStrategy;
 import org.writer.annotation.constans.NamingStrategy;
-import org.writer.exception.CsvRecordAnnotationMissingException;
+import org.writer.exception.FormatRecordAnnotationMissingException;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -51,14 +51,14 @@ public class DefaultCsvWriter implements Writable {
      * <p>
      * Метод определяет структуру CSV на основе первого не {@code null} объекта в списке.
      * Все объекты в списке должны быть одного типа и аннотированы {@link CsvRecord}.
-     * Поля для записи определяются на основе рефлексии и аннотаций {@link CsvColumn},
-     * {@link CsvTransient} и {@link CsvMasked}.
+     * Поля для записи определяются на основе рефлексии и аннотаций {@link DataField},
+     * {@link TransientField} и {@link MaskedField}.
      * </p>
      *
      * @param data Список объектов для записи. Если список {@code null}, пуст, или первый объект {@code null},
      *             метод не выполняет никаких действий (кроме выброса исключения, если аннотация отсутствует).
      * @throws IOException                         Если возникает ошибка ввода-вывода во время записи.
-     * @throws CsvRecordAnnotationMissingException Если класс объектов в списке не аннотирован {@link CsvRecord}.
+     * @throws FormatRecordAnnotationMissingException Если класс объектов в списке не аннотирован {@link CsvRecord}.
      * @throws IllegalArgumentException            Если объекты в списке разных типов.
      */
     @Override
@@ -85,14 +85,14 @@ public class DefaultCsvWriter implements Writable {
      * @param data Список данных для проверки.
      * @return {@code true}, если данные невалидны ({@code null}, пустые, первый элемент {@code null}),
      *         {@code false} в противном случае.
-     * @throws CsvRecordAnnotationMissingException если класс первого объекта не аннотирован {@link CsvRecord}.
+     * @throws FormatRecordAnnotationMissingException если класс первого объекта не аннотирован {@link CsvRecord}.
      */
     private static boolean isInvalidData(List<?> data) {
         boolean isInvalid = data == null || data.isEmpty() || data.get(0) == null;
         if (isInvalid) return true;
         Class<?> clazz = data.get(0).getClass();
         if (clazz.getAnnotation(CsvRecord.class) == null) {
-            throw new CsvRecordAnnotationMissingException(clazz);
+            throw new FormatRecordAnnotationMissingException(clazz);
         }
         return false;
     }
@@ -181,7 +181,7 @@ public class DefaultCsvWriter implements Writable {
         Field[] declaredFields = clazz.getDeclaredFields();
 
         for (Field field : declaredFields) {
-            if (field.isAnnotationPresent(CsvTransient.class) ||
+            if (field.isAnnotationPresent(TransientField.class) ||
                     java.lang.reflect.Modifier.isStatic(field.getModifiers())) {
                 continue;
             }
@@ -192,14 +192,14 @@ public class DefaultCsvWriter implements Writable {
 
             tempFields.add(new ProcessedField(field, headerName,
                     field.getAnnotation(CsvRecord.class),
-                    field.getAnnotation(CsvMasked.class)));
+                    field.getAnnotation(MaskedField.class)));
         }
 
         return tempFields;
     }
 
     /**
-     * Определяет имя заголовка для поля на основе аннотации {@link CsvColumn} и стратегии именования.
+     * Определяет имя заголовка для поля на основе аннотации {@link DataField} и стратегии именования.
      *
      * @param field               Поле для определения имени заголовка.
      * @param fieldNamingStrategy Стратегия именования по умолчанию для этого поля (обычно наследуется от класса).
@@ -207,13 +207,13 @@ public class DefaultCsvWriter implements Writable {
      */
     private String getHeader(Field field, NamingStrategy fieldNamingStrategy) {
         String headerName;
-        CsvColumn csvColumn = field.getAnnotation(CsvColumn.class);
-        if (csvColumn != null) {
-            if (!csvColumn.name().isEmpty()) {
-                headerName = csvColumn.name();
+        DataField dataField = field.getAnnotation(DataField.class);
+        if (dataField != null) {
+            if (!dataField.name().isEmpty()) {
+                headerName = dataField.name();
             } else {
-                if (csvColumn.strategy() != NamingStrategy.DEFAULT) {
-                    fieldNamingStrategy = csvColumn.strategy();
+                if (dataField.strategy() != NamingStrategy.DEFAULT) {
+                    fieldNamingStrategy = dataField.strategy();
                 }
                 headerName = applyNamingStrategy(field.getName(), fieldNamingStrategy);
             }
@@ -231,35 +231,38 @@ public class DefaultCsvWriter implements Writable {
      * @return Имя поля, преобразованное согласно стратегии.
      */
     private String applyNamingStrategy(String fieldName, NamingStrategy strategy) {
-        if (strategy == NamingStrategy.AS_IS_TO_SPACE_SEPARATED_CAPITALIZED) {
-            if (fieldName == null || fieldName.isEmpty()) return "";
-            StringBuilder result = new StringBuilder();
-            result.append(Character.toUpperCase(fieldName.charAt(0)));
-            for (int i = 1; i < fieldName.length(); i++) {
-                char currentChar = fieldName.charAt(i);
-                if (Character.isUpperCase(currentChar)) {
-                    result.append(' ');
+        if (fieldName == null || fieldName.isEmpty()) {
+            return "";
+        }
+
+        if (strategy == null) {
+            strategy = NamingStrategy.AS_IS;
+        }
+
+        return switch (strategy) {
+            case AS_IS_TO_SPACE_SEPARATED_CAPITALIZED -> {
+                StringBuilder result = new StringBuilder();
+                result.append(Character.toUpperCase(fieldName.charAt(0)));
+                for (int i = 1; i < fieldName.length(); i++) {
+                    char currentChar = fieldName.charAt(i);
+                    if (Character.isUpperCase(currentChar)) {
+                        result.append(' ');
+                    }
+                    result.append(currentChar);
                 }
-                result.append(currentChar);
+                yield result.toString();
             }
-            return result.toString();
-        }
-        if (strategy == NamingStrategy.CAMEL_TO_SNAKE_CASE) {
-            if (fieldName == null || fieldName.isEmpty()) return "";
-            return fieldName.replaceAll("([a-z])([A-Z]+)", "$1_$2").toLowerCase();
-        }
-        if (strategy == NamingStrategy.CAMEL_TO_SCREAMING_SNAKE_CASE) {
-            if (fieldName == null || fieldName.isEmpty()) return "";
-            return fieldName.replaceAll("([a-z])([A-Z]+)", "$1_$2").toUpperCase();
-        }
-        return fieldName;
+            case CAMEL_TO_SNAKE_CASE -> fieldName.replaceAll("([a-z])([A-Z]+)", "$1_$2").toLowerCase();
+            case CAMEL_TO_SCREAMING_SNAKE_CASE -> fieldName.replaceAll("([a-z])([A-Z]+)", "$1_$2").toUpperCase();
+            case DEFAULT, AS_IS -> fieldName;
+        };
     }
 
     /**
      * Преобразует значение поля в строку, применяя маскирование, если оно настроено.
      *
      * @param value          Значение поля.
-     * @param processedField Информация об обработанном поле, включая аннотацию {@link CsvMasked}.
+     * @param processedField Информация об обработанном поле, включая аннотацию {@link MaskedField}.
      * @return Строковое представление значения поля, возможно, замаскированное.
      *         Возвращает пустую строку, если {@code value} равно {@code null}.
      */
@@ -268,11 +271,11 @@ public class DefaultCsvWriter implements Writable {
             return "";
         }
 
-        CsvMasked csvMasked = processedField.getCsvMasked();
+        MaskedField maskedField = processedField.getMaskedField();
         String stringValue = value.toString();
 
-        if (csvMasked != null) {
-            stringValue = applyMasking(stringValue, csvMasked);
+        if (maskedField != null) {
+            stringValue = applyMasking(stringValue, maskedField);
         }
         return stringValue;
     }
@@ -281,16 +284,16 @@ public class DefaultCsvWriter implements Writable {
      * Применяет стратегию маскирования к строковому значению.
      *
      * @param originalValue Исходное строковое значение.
-     * @param csvMasked     Аннотация {@link CsvMasked} с настройками маскирования.
+     * @param maskedField     Аннотация {@link MaskedField} с настройками маскирования.
      * @return Замаскированное значение или исходное, если маскирование не применимо.
      *         Возвращает пустую строку, если {@code originalValue} равно {@code null} или пусто.
      */
-    private String applyMasking(String originalValue, CsvMasked csvMasked) {
+    private String applyMasking(String originalValue, MaskedField maskedField) {
         if (originalValue == null || originalValue.isEmpty()) return "";
 
-        MaskingStrategy strategy = csvMasked.strategy();
-        char maskChar = csvMasked.maskCharacter();
-        int visibleChars = csvMasked.visibleChars();
+        MaskingStrategy strategy = maskedField.strategy();
+        char maskChar = maskedField.maskCharacter();
+        int visibleChars = maskedField.visibleChars();
 
         return switch (strategy) {
             case ASTERISKS_FULL -> repeatChar(maskChar, originalValue.length());
@@ -374,6 +377,6 @@ public class DefaultCsvWriter implements Writable {
         private final Field field;
         private final String headerName;
         private final CsvRecord csvRecord;
-        private final CsvMasked csvMasked;
+        private final MaskedField maskedField;
     }
 }

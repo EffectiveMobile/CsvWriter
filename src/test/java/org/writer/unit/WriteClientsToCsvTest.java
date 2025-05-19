@@ -99,7 +99,7 @@ class WriteClientsToCsvTest {
                 Client.builder()
                         .firstName("TestFirstName")
                         .lastName("ShouldBeIgnored") // @CsvTransient
-                        .accountNumber("1234567890123456") // 16 цифр
+                        .accountNumber("1234567890123456")
                         .amountToPay(new BigDecimal("123.45"))
                         .build()
         );
@@ -109,9 +109,8 @@ class WriteClientsToCsvTest {
 
         // then
         List<String> actualLines = readAllLinesFromFile();
-        assertEquals(2, actualLines.size()); // 1 заголовок + 1 клиент
+        assertEquals(2, actualLines.size());
 
-        // @CsvMasked(maskCharacter = 'X', strategy = MaskingStrategy.ASTERISKS_PARTIAL_PREFIX, visibleChars = 4 (default))
         // "1234567890123456" -> "1234XXXXXXXXXXXX"
         String expectedAccountNumberMasked = "1234XXXXXXXXXXXX";
         String expectedDataLine = String.format("%s,%s,%s",

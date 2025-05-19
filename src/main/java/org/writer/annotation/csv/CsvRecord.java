@@ -1,4 +1,4 @@
-package org.writer.annotation;
+package org.writer.annotation.csv;
 
 import org.writer.annotation.constans.NamingStrategy;
 

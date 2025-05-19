@@ -3,7 +3,7 @@ package org.writer.model;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import org.writer.annotation.CsvRecord;
+import org.writer.annotation.csv.CsvRecord;
 import org.writer.annotation.constans.NamingStrategy;
 
 @Data

@@ -9,11 +9,14 @@ import java.lang.annotation.Target;
 
 /**
  * Указывает, что значение аннотированного поля должно быть замаскировано
- * или преобразовано перед записью в CSV.
+ * или преобразовано перед сериализацией.
+ *
+ * @author Астонский Шпион
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface CsvMasked {
+public @interface MaskedField {
+
     /**
      * Стратегия маскирования.
      */
@@ -28,6 +31,7 @@ public @interface CsvMasked {
     /**
      * Количество видимых символов в начале строки для ASTERISKS_PARTIAL_PREFIX.
      * Или количество видимых символов в конце строки для ASTERISKS_PARTIAL_SUFFIX.
+     * Например, для карт XXXX-XXXX-XXXX-1234, visibleChars = 4, strategy = ASTERISKS_PARTIAL_SUFFIX
      */
-    int visibleChars() default 4; // Например, для карт XXXX-XXXX-XXXX-1234, visibleChars = 4, strategy = ASTERISKS_PARTIAL_SUFFIX
+    int visibleChars() default 4;
 }

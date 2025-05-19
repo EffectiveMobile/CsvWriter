@@ -3,9 +3,9 @@ package org.writer.model;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import org.writer.annotation.CsvMasked;
-import org.writer.annotation.CsvRecord;
-import org.writer.annotation.CsvTransient;
+import org.writer.annotation.MaskedField;
+import org.writer.annotation.csv.CsvRecord;
+import org.writer.annotation.TransientField;
 import org.writer.annotation.constans.MaskingStrategy;
 import org.writer.annotation.constans.NamingStrategy;
 
@@ -18,9 +18,9 @@ import java.math.BigDecimal;
 public class Client {
 
     private String firstName;
-    @CsvTransient
+    @TransientField
     private String lastName;
-    @CsvMasked(maskCharacter = 'X', strategy = MaskingStrategy.ASTERISKS_PARTIAL_PREFIX)
+    @MaskedField(maskCharacter = 'X', strategy = MaskingStrategy.ASTERISKS_PARTIAL_PREFIX)
     private String accountNumber;
     private BigDecimal amountToPay;
 }

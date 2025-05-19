@@ -7,9 +7,11 @@ import java.lang.annotation.Target;
 
 /**
  * Указывает, что аннотированное поле должно быть исключено
- * из записи в CSV-файл.
+ * из процесса сериализации/десериализации.
+ *
+ * @author Астонский Шпион
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface CsvTransient {
+public @interface TransientField {
 }
