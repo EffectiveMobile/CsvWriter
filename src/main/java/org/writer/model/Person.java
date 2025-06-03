@@ -16,7 +16,7 @@ public class Person {
     @Column(columnName = "Last name", position = 2)
     private String lastName;
 
-    @Column(columnName = "Day of birth name", position = 3)
+    @Column(columnName = "Day of birth", position = 3)
     private int dayOfBirth;
 
     @Column(columnName = "Month of birth", position = 4)
