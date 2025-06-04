@@ -81,9 +81,7 @@ public class CsvWriterTest {
         List<Person> empty = List.of();
         Path csvFile = tempDir.resolve("empty.csv");
 
-        assertThrows(IllegalArgumentException.class, () -> {
-            writer.writeToFile(empty, csvFile.toString());
-        });
+        assertThrows(IllegalArgumentException.class, () -> writer.writeToFile(empty, csvFile.toString()));
     }
 
     /**
