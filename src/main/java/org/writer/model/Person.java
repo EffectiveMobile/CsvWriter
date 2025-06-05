@@ -22,7 +22,7 @@ public class Person {
     @CsvField(name = "MonthOfBirth")
     private Months monthOfBirth;
 
-    @CsvField
+    @CsvField(name = "YearOfBirth")
     private int yearOfBirth;
 
 }
