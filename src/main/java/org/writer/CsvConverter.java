@@ -1,5 +1,7 @@
 package org.writer;
 
+import java.util.List;
+
 public interface CsvConverter {
-    String convertToCsvRow(Object object) throws IllegalAccessException;
+    String toCsvString(List<?> objects) throws IllegalAccessException;
 }
