@@ -1,5 +1,6 @@
 package org.writer;
 
+import org.writer.csv.SimpleCsvConverter;
 import org.writer.model.Months;
 import org.writer.model.Person;
 import org.writer.model.Student;
@@ -7,25 +8,27 @@ import org.writer.model.Student;
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) throws IllegalAccessException {
+    public static void main(String[] args) {
 
-        List<String> scores1 = List.of("score1", "score2");
-        Student student1 = Student.builder()
-                .name("Ivan")
-                .score(scores1)
-                .build();
-
-        List<String> score2 = List.of("111", "222", "333");
         Student student = Student.builder()
-                .name("Asya")
-                .score(score2)
+                .name("Ivan")
+                .score(List.of("5", "3", "4", "4"))
                 .build();
 
+        Student student1 = Student.builder()
+                .name("Asya")
+                .score(List.of("111", "222", "333"))
+                .build();
 
         Student student2 = Student.builder()
                 .name("Senya")
                 .build();
+        List<?> students = List.of(student, student1, student2);
 
+        SimpleCsvConverter csvConverter = new SimpleCsvConverter();
+        csvConverter.setConvertCollectionAsMultipleCell(true);
+        Writable csvWriter = new CsvWriter(csvConverter);
+        csvWriter.writeToFile(students, "students.csv");
 
         Person person1 = Person.builder()
                 .firstName("Сергей")
@@ -35,7 +38,27 @@ public class Main {
                 .yearOfBirth(1995)
                 .build();
 
-        StringCsvWriter csvWriter = new StringCsvWriter(new SimpleCsvConverter());
-        csvWriter.writeToFile(List.of(person1), "/home/alexei/IdeaProjects/CsvWriter");
+        Person person2 = Person.builder()
+                .firstName("Тихон")
+                .lastName("Иванов")
+                .dayOfBirth(11)
+                .monthOfBirth(Months.APRIL)
+                .yearOfBirth(1995)
+                .build();
+
+        Person person3 = Person.builder()
+                .firstName("Николай")
+                .dayOfBirth(11)
+                .monthOfBirth(Months.APRIL)
+                .yearOfBirth(1995)
+                .build();
+
+        List<?> persons = List.of(person1, person2, person3);
+        Writable personWriter = new CsvWriter(new SimpleCsvConverter());
+        personWriter.writeToFile(persons, "persons.csv");
+
+
+
+
     }
 }

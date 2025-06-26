@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import org.writer.annotation.Csv;
+import org.writer.annotation.CsvExclude;
 
 @Data
 @Builder
@@ -20,5 +21,8 @@ public class Person {
     private Months monthOfBirth;
 
     private int yearOfBirth;
+
+    @CsvExclude
+    private String passport;
 
 }

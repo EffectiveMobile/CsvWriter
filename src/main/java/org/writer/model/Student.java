@@ -16,4 +16,5 @@ public class Student {
     private String name;
 
     private List<String> score;
+
 }
