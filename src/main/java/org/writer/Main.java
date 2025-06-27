@@ -57,7 +57,11 @@ public class Main {
         Writable personWriter = new CsvWriter(new SimpleCsvConverter());
         personWriter.writeToFile(persons, "persons.csv");
 
+        List<?> strings = List.of("String1", "String2", "Text1");
+        new CsvWriter(new SimpleCsvConverter()).writeToFile(strings, "Strings.csv");
 
+        List<?> integers = List.of(55, 47,1230, 33,44,66,77, 100);
+        new CsvWriter(new SimpleCsvConverter()).writeToFile(integers, "integers.csv");
 
 
     }

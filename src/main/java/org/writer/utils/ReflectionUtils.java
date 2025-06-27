@@ -2,6 +2,7 @@ package org.writer.utils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.InaccessibleObjectException;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -15,7 +16,7 @@ public class ReflectionUtils {
         return Collection.class.isAssignableFrom(field.getType());
     }
 
-    public static Object getPrivateFieldValue(Object object, Field objectField) throws IllegalAccessException {
+    public static Object getPrivateFieldValue(Object object, Field objectField) throws IllegalAccessException, InaccessibleObjectException {
         objectField.setAccessible(true);
         return objectField.get(object);
     }

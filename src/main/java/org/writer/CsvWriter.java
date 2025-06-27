@@ -1,8 +1,9 @@
 package org.writer;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.writer.csv.CsvConverter;
+import org.writer.csv.SimpleCsvConverter;
 import org.writer.exception.DirectoryNotFoundException;
 
 import java.io.File;
@@ -12,23 +13,26 @@ import java.nio.file.FileSystems;
 import java.util.List;
 
 /**
- * @ClassName Conf
+ * @ClassName CsvWriter
  * @Author Alexei Shvariov
  * @Date 26.06.2025
  * @Version 1.0
  */
 
-@RequiredArgsConstructor
+@AllArgsConstructor
 @Slf4j
 public class CsvWriter implements Writable {
-    private final CsvConverter csvConverter;
+    private CsvConverter csvConverter;
 
     @Override
     public void writeToFile(List<?> data, String fileName) {
+        if (csvConverter == null) {
+            csvConverter = new SimpleCsvConverter();
+        }
         checkFileName(fileName);
         try (FileWriter writer = new FileWriter(fileName)){
             writer.write(csvConverter.toCsvString(data));
-            log.info("Данные успешно записаны в файл {}", fileName);
+            log.info("CSV data successfully written to file {}", fileName);
         } catch (IOException ex) {
             throw new RuntimeException("Error writing to a file: " + ex.getMessage());
         }
