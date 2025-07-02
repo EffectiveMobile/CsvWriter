@@ -1,5 +1,7 @@
 package org.writer;
 
+import org.writer.exception.IORuntimeException;
+
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -51,7 +53,7 @@ public class CsvWriter implements Writable {
      *
      * @param data     список объектов
      * @param fileName имя файла
-     * @throws RuntimeException если произошла ошибка при записи
+     * @throws IORuntimeException если произошла ошибка при записи
      */
     @Override
     public void writeToFile(List<?> data, String fileName) {
@@ -68,7 +70,7 @@ public class CsvWriter implements Writable {
                 writeRow(writer, entity, csvFields);
             }
         } catch (IOException e) {
-            throw new RuntimeException(IO_ERROR_MSG + fileName, e);
+            throw new IORuntimeException(IO_ERROR_MSG + fileName);
         }
     }
 
@@ -113,7 +115,7 @@ public class CsvWriter implements Writable {
      * @param obj    объект, который нужно сериализовать
      * @param fields список полей, аннотированных {@link CsvField}
      * @throws IOException      если произошла ошибка при записи
-     * @throws RuntimeException если возникает {@link IllegalAccessException}
+     * @throws IORuntimeException если возникает {@link IllegalAccessException}
      */
     private void writeRow(FileWriter writer, Object obj, List<Field> fields) throws IOException {
         String row = fields.stream()
@@ -123,7 +125,7 @@ public class CsvWriter implements Writable {
                         Object val = f.get(obj);
                         return val != null ? escapeCsv(val.toString()) : EMPTY_STRING;
                     } catch (IllegalAccessException e) {
-                        throw new RuntimeException(ERROR_ACCESS_FIELD_MSG, e);
+                        throw new IORuntimeException(ERROR_ACCESS_FIELD_MSG);
                     }
                 })
                 .collect(Collectors.joining(COMMA));
