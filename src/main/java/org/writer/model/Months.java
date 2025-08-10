@@ -1,5 +1,9 @@
 package org.writer.model;
 
+/**
+ * An enumeration describing all the months of the year.
+ * Used to store birth month values in Face.
+ */
 public enum Months {
     JANUARY,
     FEBRUARY,

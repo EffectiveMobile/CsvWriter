@@ -10,6 +10,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
+/**
+ * Main application entry point.
+ * Generates sample Person and Student data and writes them to CSV files.
+ */
 public class Main {
     public static void main(String[] args) {
         Writable writer = new CsvWriter();
@@ -18,9 +22,10 @@ public class Main {
 
         int currentYear = LocalDateTime.now().getYear();
 
-
+        // Create sample people
         List<Person> people = List.of(
-                Person.builder().firstName(faker.name().firstName())
+                Person.builder()
+                        .firstName(faker.name().firstName())
                         .lastName(faker.name().lastName())
                         .dayOfBirth(random.nextInt(30) + 1)
                         .monthOfBirth(Months.values()[random.nextInt(12)])
@@ -44,6 +49,7 @@ public class Main {
 
         writer.writeToFile(people, "persons.csv");
 
+        // Create sample students
         List<Student> students = List.of(
                 Student.builder().name(faker.name().firstName()).score(List.of("F", "F", "F")).build(),
                 Student.builder().name(faker.name().firstName()).score(List.of("A", "A", "A")).build(),
