@@ -3,10 +3,12 @@ package org.writer.model;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import org.writer.annotation.WritableToCsv;
 
 @Data
 @Builder
 @AllArgsConstructor
+@WritableToCsv
 public class Person {
 
     private String firstName;
