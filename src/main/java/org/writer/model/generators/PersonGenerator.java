@@ -11,10 +11,9 @@ import java.util.List;
 /**
  * Additional class for quickly creating {@link Person} class objects.
  *
- * @ClassName PersonGenerator
- * @Author Alexei Shvariov
- * @Date 27.06.2025
- * @Version 1.0
+ * @author Alexei Shvariov
+ * @date 27.06.2025
+ * @version 1.0
  */
 
 @RequiredArgsConstructor
