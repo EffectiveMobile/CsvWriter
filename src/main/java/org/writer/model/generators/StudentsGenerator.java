@@ -10,10 +10,8 @@ import java.util.List;
 /**
  * Additional class for quickly creating Student class objects.
  *
- * @ClassName StudentsGenerator
- * @Author Alexei Shvariov
- * @Date 27.06.2025
- * @Version 1.0
+ * @author Alexei Shvariov
+ * @version 1.0
  */
 
 @AllArgsConstructor

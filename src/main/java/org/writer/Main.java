@@ -12,7 +12,8 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) {
         final String sep = FileSystems.getDefault().getSeparator();
-        final File directory = new File("csvFiles");
+        final String fileName = "csvFiles";
+        final File directory = new File(fileName);
         if (!directory.exists()) {
             directory.mkdir();
         }
@@ -21,17 +22,17 @@ public class Main {
         SimpleCsvConverter csvConverter = new SimpleCsvConverter();
         csvConverter.setConvertCollectionAsMultipleCell(true);
         Writable csvWriter = new CsvWriter(csvConverter);
-        csvWriter.writeToFile(students, "csvFiles" + sep + "students.csv");
+        csvWriter.writeToFile(students, fileName + sep + "students.csv");
 
         List<?> persons = new PersonGenerator(new Faker()).getPersonsList(100);
         Writable personWriter = new CsvWriter(new SimpleCsvConverter());
-        personWriter.writeToFile(persons, "csvFiles" + sep + "persons.csv");
+        personWriter.writeToFile(persons, fileName + sep + "persons.csv");
 
         List<?> strings = List.of("String1", "String2", "Text1");
-        new CsvWriter(new SimpleCsvConverter()).writeToFile(strings, "csvFiles" + sep + "Strings.csv");
+        new CsvWriter(new SimpleCsvConverter()).writeToFile(strings, fileName + sep + "Strings.csv");
 
         List<?> integers = List.of(55, 47, 1230, 33, 44, 66, 77, 100);
-        new CsvWriter(new SimpleCsvConverter()).writeToFile(integers, "csvFiles" + sep + "integers.csv");
+        new CsvWriter(new SimpleCsvConverter()).writeToFile(integers, fileName + sep + "integers.csv");
 
 
     }

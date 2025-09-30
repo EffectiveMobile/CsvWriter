@@ -15,9 +15,8 @@ import java.util.List;
  * <T> – the type of data obtained as a result of object conversion.
  * Return data type must be declared in implemented class.
  *
- * @Author Alexei Shvariov
- * @Date 26.06.2025
- * @Version 1.0
+ * @author Alexei Shvariov
+ * @version 1.0
  */
 public interface CsvConverter<T> {
 

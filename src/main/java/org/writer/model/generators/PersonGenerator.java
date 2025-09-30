@@ -12,7 +12,6 @@ import java.util.List;
  * Additional class for quickly creating {@link Person} class objects.
  *
  * @author Alexei Shvariov
- * @date 27.06.2025
  * @version 1.0
  */
 

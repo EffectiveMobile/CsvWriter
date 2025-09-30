@@ -8,12 +8,15 @@ import java.util.Collection;
  * Is Collection of utility methods for get information about object's fields
  * using java reflection API.
  *
- * @Author Alexei Shvariov
- * @Date 26.06.2025
- * @Version 1.0
+ * @author Alexei Shvariov
+ * @version 1.0
  */
 
+@SuppressWarnings("squid:S3011") // Рефлексия используется с целью выполнения задания.
 public class ReflectionUtils {
+
+    private ReflectionUtils() {
+    }
 
     /**
      * Get array of declared fields for object's class.

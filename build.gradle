@@ -7,6 +7,8 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
+    id 'jacoco'
+    id "org.sonarqube" version "6.3.1.5724"
 
 }
 
@@ -37,17 +39,31 @@ description = 'csv'
 java.sourceCompatibility = '21'
 java.targetCompatibility = '21'
 
-publishing {
-    publications {
-        maven(MavenPublication) {
-            from(components.java)
-        }
+
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    reports {
+        xml.required = true
+        csv.required = false
+        html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+    }
+    dependsOn test
+}
+
+sonar {
+    properties {
+        property 'sonar.host.url', 'http://localhost:9000'
     }
 }
 
-test {
-    useJUnitPlatform() // Пример использования JUnit 5
+tasks.named('sonar').configure {
+    dependsOn jacocoTestReport
 }
+
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
@@ -56,3 +72,4 @@ tasks.withType(JavaCompile).configureEach {
 tasks.withType(Javadoc).configureEach {
     options.encoding = 'UTF-8'
 }
+

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.writer.csv.SimpleCsvConverter;
 import org.writer.model.Person;
+import org.writer.model.Student;
 import org.writer.model.generators.PersonGenerator;
 import org.writer.model.generators.StudentsGenerator;
 
@@ -16,7 +17,7 @@ import java.nio.file.FileSystems;
 import java.util.Collections;
 import java.util.List;
 
-public class CsvWriterTest {
+class CsvWriterTest {
     private static final String SEPARATOR = FileSystems.getDefault().getSeparator();
     private final PersonGenerator personGenerator = new PersonGenerator(new Faker());
     private final StudentsGenerator studentsGenerator = new StudentsGenerator(new Faker());
@@ -26,7 +27,7 @@ public class CsvWriterTest {
 
     @Test
     @DisplayName("Test writeToFile _when write valid object list then file success written")
-    public void testWriteToFile_whenWriteValidObjectList_thenFileSuccessWritten() {
+    void testWriteToFile_whenWriteValidObjectList_thenFileSuccessWritten() {
         final String fileName = "filename.csv";
         final String filePath = tempDir.getPath() + SEPARATOR + fileName;
         final Writable writer = new CsvWriter(new SimpleCsvConverter());
@@ -41,7 +42,7 @@ public class CsvWriterTest {
 
     @Test
     @DisplayName("Test writeToFile _when not set CsvConverter for CsvWriter then file success written")
-    public void testWriteToFile_whenSetCsvConverterIsNull_thenFileSuccessWritten() {
+    void testWriteToFile_whenSetCsvConverterIsNull_thenFileSuccessWritten() {
         final String fileName = "filename.csv";
         final String filePath = tempDir.getPath() + SEPARATOR + fileName;
         final Writable writer = new CsvWriter(null);
@@ -55,69 +56,75 @@ public class CsvWriterTest {
 
     @Test
     @DisplayName("Test writeToFile when fileName is null then throws IllegalArgumentException")
-    public void testWriteToFile_whenFileNameIsNull_thenThrowsIllegalArgumentException() {
+    void testWriteToFile_whenFileNameIsNull_thenThrowsIllegalArgumentException() {
         final Writable writer = new CsvWriter(new SimpleCsvConverter());
 
+        List<Student> studentsList = studentsGenerator.getStudentsList(3);
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> writer.writeToFile(studentsGenerator.getStudentsList(3), null));
+                () -> writer.writeToFile(studentsList, null));
     }
 
     @Test
     @DisplayName("Test writeToFile when fileName is empty then throws IllegalArgumentException")
-    public void testWriteToFile_whenFileNameIsEmpty_thenThrowsIllegalArgumentException() {
+    void testWriteToFile_whenFileNameIsEmpty_thenThrowsIllegalArgumentException() {
         final String fileName = "";
         final Writable writer = new CsvWriter(new SimpleCsvConverter());
 
+        List<Student> studentsList = studentsGenerator.getStudentsList(3);
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> writer.writeToFile(studentsGenerator.getStudentsList(3), fileName));
+                () -> writer.writeToFile(studentsList, fileName));
     }
 
     @Test
     @DisplayName("Test writeToFile when fileName not contains extension then throws IllegalArgumentException")
-    public void testWriteToFile_whenFileNameWithoutExtension_thenThrowsIllegalArgumentException() {
+    void testWriteToFile_whenFileNameWithoutExtension_thenThrowsIllegalArgumentException() {
         final String fileName = "filename";
         final String filePath = tempDir.getPath() + SEPARATOR + fileName;
         final Writable writer = new CsvWriter(new SimpleCsvConverter());
 
+        List<Student> studentsList = studentsGenerator.getStudentsList(3);
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> writer.writeToFile(studentsGenerator.getStudentsList(3), filePath));
+                () -> writer.writeToFile(studentsList, filePath));
     }
 
     @Test
     @DisplayName("Test writeToFile when fileName contains only extension then throws IllegalArgumentException")
-    public void testWriteToFile_whenFileNameContainsOnlyExtension_thenThrowsIllegalArgumentException() {
+    void testWriteToFile_whenFileNameContainsOnlyExtension_thenThrowsIllegalArgumentException() {
         final String fileName = ".csv";
         final String filePath = tempDir.getPath() + SEPARATOR + fileName;
         final Writable writer = new CsvWriter(new SimpleCsvConverter());
 
+        List<Student> studentsList = studentsGenerator.getStudentsList(3);
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> writer.writeToFile(studentsGenerator.getStudentsList(3), filePath));
+                () -> writer.writeToFile(studentsList, filePath));
     }
 
     @Test
     @DisplayName("Test writeToFile when fileName contains only directory then throws IllegalArgumentException")
-    public void testWriteToFile_whenFileNameContainsOnlyDirectory_thenThrowsIllegalArgumentException() {
+    void testWriteToFile_whenFileNameContainsOnlyDirectory_thenThrowsIllegalArgumentException() {
         final String filePath = tempDir.getPath() + SEPARATOR;
         final Writable writer = new CsvWriter(new SimpleCsvConverter());
 
+        List<Student> studentsList = studentsGenerator.getStudentsList(3);
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> writer.writeToFile(studentsGenerator.getStudentsList(3), filePath));
+                () -> writer.writeToFile(studentsList, filePath));
     }
 
     @Test
     @DisplayName("Test writeToFile when data is empty then throws IllegalArgumentException")
-    public void testWriteToFile_whenDataIsEmpty_thenThrowsIllegalArgumentException() {
+    void testWriteToFile_whenDataIsEmpty_thenThrowsIllegalArgumentException() {
         final String fileName = "filename.csv";
         final String filePath = tempDir.getPath() + SEPARATOR + fileName;
         final Writable writer = new CsvWriter(new SimpleCsvConverter());
 
+        List<Student> studentsList = Collections.emptyList();
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> writer.writeToFile(Collections.emptyList(), filePath));
+                () -> writer.writeToFile(studentsList, filePath));
     }
 
     @Test
     @DisplayName("Test writeToFile when data is null then throws IllegalArgumentException")
-    public void testWriteToFile_whenDataIsNull_thenThrowsIllegalArgumentException() {
+    void testWriteToFile_whenDataIsNull_thenThrowsIllegalArgumentException() {
         final String fileName = "filename.csv";
         final String filePath = tempDir.getPath() + SEPARATOR + fileName;
         final Writable writer = new CsvWriter(new SimpleCsvConverter());

@@ -18,9 +18,8 @@ import java.util.List;
  * Attempting to pass empty collection or null to a parameter data or fileName causes an unchecked
  * {@link IllegalArgumentException}. Errors when writing to csv file cause {@link WriteToFileException}.
  *
- * @Author Alexei Shvariov
- * @Date 26.06.2025
- * @Version 1.0
+ * @author Alexei Shvariov
+ * @version 1.0
  */
 
 @AllArgsConstructor
@@ -80,10 +79,8 @@ public class CsvWriter implements Writable {
     private void createDirectoryIfNotExists(String filePath, int lastFileSeparatorIndex) {
         final String directoryPath = filePath.substring(0, lastFileSeparatorIndex);
         final File directory = new File(directoryPath);
-        if (!directory.exists()) {
-            if (directory.mkdirs()) {
+        if (!directory.exists() && directory.mkdirs()) {
                 log.info("Created directory: {}", directory.getPath());
-            }
         }
     }
 
