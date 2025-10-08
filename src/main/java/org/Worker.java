@@ -1,5 +1,9 @@
 package org;
 
+import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.task.MapTask;
 import org.task.ReduceTask;
 import org.task.Task;
@@ -15,7 +19,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 public class Worker implements Runnable {
+    private static final Logger log = LoggerFactory.getLogger(Worker.class);
     private Coordinator coordinator;
 
     public Worker(Coordinator coordinator) {
@@ -24,16 +30,23 @@ public class Worker implements Runnable {
 
     @Override
     public void run() {
-        while (true) {
-            Task task = coordinator.getTask();
-            if (task == null) break;
+        try {
 
-            if (task instanceof MapTask) {
-                processMapTask((MapTask) task);
-            } else if (task instanceof ReduceTask) {
-                processReduceTask((ReduceTask) task);
+            Task task = coordinator.getTask();
+
+            if ((task = coordinator.getTask()) != null) {
+
+                if (task instanceof MapTask) {
+                    processMapTask((MapTask) task);
+                } else if (task instanceof ReduceTask) {
+                    processReduceTask((ReduceTask) task);
+                }
             }
+        } catch (Exception e) {
+            Thread.currentThread().interrupt();
+            log.error("Ошибка при получении или обработке задачи: {}", e.getMessage(), e);
         }
+
     }
 
     private void processMapTask(MapTask task) {
@@ -57,14 +70,17 @@ public class Worker implements Runnable {
             }
 
             coordinator.reportIntermediateFiles(files);
-
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Ошибка ввода/вывода при обработке MapTask id={}: {}", task.id, e.getMessage(), e);
+            returnTaskForRetry(task, e);
+        } catch (Exception e) {
+            log.error("Неожиданная ошибка при обработке MapTask id={}: {}", task.id, e.getMessage(), e);
         }
     }
 
     private void processReduceTask(ReduceTask task) {
         try {
+
             Map<String, List<String>> grouped = new HashMap<>();
 
             // читаем все промежуточные файлы
@@ -87,10 +103,31 @@ public class Worker implements Runnable {
                 String result = MapReduceFunctions.reduce(key, grouped.get(key));
                 writer.write(key + " " + result + "\n");
             }
+
             writer.close();
 
-        } catch (IOException e) {
-            e.printStackTrace();
+        }catch (IOException e) {
+
+            log.error("Ошибка ввода/вывода при обработке ReduceTask id={}: {}", task.id, e.getMessage(), e);
+            returnTaskForRetry(task, e);
+        } catch (Exception e) {
+
+            log.error("Неожиданная ошибка при обработке ReduceTask id={}: {}", task.id, e.getMessage(), e);
         }
     }
+    private void returnTaskForRetry(Task task, Exception e) {
+
+        synchronized (coordinator) {
+            if (task instanceof MapTask) {
+                coordinator.getMapTasks().offer((MapTask) task);
+            } else if (task instanceof ReduceTask) {
+                ReduceTask reduceTask = (ReduceTask) task;
+                reduceTask.setFiles(new ArrayList<>(coordinator.getIntermediateFiles()));
+                coordinator.getReduceTasks().offer(reduceTask);
+            } else {
+                log.error("Неизвестный тип задачи: {}", task.getClass().getSimpleName());
+            }
+        }
+    }
+
 }

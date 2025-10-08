@@ -1,5 +1,7 @@
 package org;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.task.MapTask;
 import org.task.ReduceTask;
 import org.task.Task;
@@ -10,6 +12,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+@Getter
+@Setter
 public class Coordinator {
 
     private Queue<MapTask> mapTasks;
@@ -46,7 +50,7 @@ public class Coordinator {
         return null; // задачи закончились
     }
 
-    public void reportIntermediateFiles(List<String> files) {
+    public synchronized void reportIntermediateFiles(List<String> files) {
         intermediateFiles.addAll(files);
     }
 }
