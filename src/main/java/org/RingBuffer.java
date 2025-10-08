@@ -10,16 +10,20 @@ public class RingBuffer <T>{
     private int head = 0;
     private int tail = 0;
     private int count = 0;
+    private int size = 0;
+    private boolean closed = false;
 
     private final Lock lock = new ReentrantLock();
     private final Condition notFull = lock.newCondition();
     private final Condition notEmpty = lock.newCondition();
 
     public RingBuffer(int capacity) {
+
+
         buffer = (T[]) new Object[capacity];
     }
 
-    // Добавление элемента в буфер
+
     public void put(T item) throws InterruptedException {
         lock.lock();
         try {
@@ -29,10 +33,26 @@ public class RingBuffer <T>{
             buffer[tail] = item;
             tail = (tail + 1) % buffer.length;
             count++;
-            notEmpty.signal();
+            notEmpty.signalAll();
         } finally {
             lock.unlock();
         }
+    }
+    public synchronized boolean isFull() {
+        return size == buffer.length;
+    }
+
+    public synchronized boolean isEmpty() {
+        return size == 0;
+    }
+
+    public synchronized void close() {
+        closed = true;
+        notifyAll();
+    }
+
+    public synchronized boolean isClosed() {
+        return closed;
     }
 
     // Извлечение элемента из буфера
@@ -45,7 +65,7 @@ public class RingBuffer <T>{
             T item = buffer[head];
             head = (head + 1) % buffer.length;
             count--;
-            notFull.signal();
+            notFull.signalAll();
             return item;
         } finally {
             lock.unlock();
