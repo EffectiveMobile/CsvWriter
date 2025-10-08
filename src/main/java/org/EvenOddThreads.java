@@ -23,11 +23,12 @@ public class EvenOddThreads {
                     wait();
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
+                    return;
                 }
             } else {
                 System.out.println(Thread.currentThread().getName() + ": " + number);
                 number++;
-                notify(); // разбудить другой поток
+                notifyAll();
             }
         }
     }
@@ -40,11 +41,12 @@ public class EvenOddThreads {
                     wait();
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
+                    return;
                 }
             } else {
                 System.out.println(Thread.currentThread().getName() + ": " + number);
                 number++;
-                notify(); // разбудить другой поток
+                notifyAll();
             }
         }
     }
