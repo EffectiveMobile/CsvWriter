@@ -1,7 +1,10 @@
 package org.writer;
 
+import java.util.Collections;
+
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Hello world!");
+        var docWriter = new Report(new CsvDocument());
+        docWriter.writeObjectAsDoc(Collections.emptyList(), "People");
     }
 }
