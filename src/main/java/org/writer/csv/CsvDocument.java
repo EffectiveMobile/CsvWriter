@@ -10,7 +10,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -112,9 +111,7 @@ public class CsvDocument implements Writable {
 
         // Значения
         for (int i = 0; i < data.size(); i++) {
-            values(data.get(i)).stream()
-                    .filter(Objects::nonNull)
-                    .forEach(v -> sb.append(v).append(", "));
+            values(data.get(i)).forEach(v -> sb.append(v).append(", "));
             sb.setLength(sb.length() - 2);
             sb.append('\n');
         }
