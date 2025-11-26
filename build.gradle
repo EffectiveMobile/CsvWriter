@@ -1,0 +1,31 @@
+plugins {
+    id "application"
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly("org.projectlombok:lombok:1.18.42")
+    annotationProcessor("org.projectlombok:lombok:1.18.42")
+
+    testCompileOnly("org.projectlombok:lombok:1.18.42")
+    testAnnotationProcessor("org.projectlombok:lombok:1.18.42")
+
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
+    testImplementation("net.datafaker:datafaker:2.5.1")
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+group = "org.writer"
+version = "1.0.0"
