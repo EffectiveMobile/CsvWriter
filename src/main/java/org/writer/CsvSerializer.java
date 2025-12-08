@@ -29,7 +29,7 @@ public class CsvSerializer {
     public String serialize(List<?> objects) {
         validateInput(objects);
 
-        Class<?> clazz = objects.getFirst().getClass();
+        Class<?> clazz = objects.get(0).getClass();
         List<Field> fields = getFields(clazz);
         StringBuilder result = new StringBuilder();
 
@@ -135,7 +135,7 @@ public class CsvSerializer {
             throw new IllegalArgumentException("Objects list cannot be empty");
         }
 
-        Class<?> firstClass = objects.getFirst().getClass();
+        Class<?> firstClass = objects.get(0).getClass();
         objects.forEach(obj -> {
             if (!obj.getClass().equals(firstClass)) {
                 throw new IllegalArgumentException("All objects must be of the same type");
