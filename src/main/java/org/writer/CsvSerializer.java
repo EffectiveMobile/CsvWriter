@@ -24,7 +24,7 @@ public class CsvSerializer {
      *
      * @param objects список объектов для сериализации
      * @return строка в формате CSV
-     * @throws IllegalArgumentException если список пуст или не содержит аннотированных полей
+     * @throws IllegalArgumentException если список пуст
      */
     public String serialize(List<?> objects) {
         validateInput(objects);
@@ -35,23 +35,18 @@ public class CsvSerializer {
 
         result.append(createHeaderString(fields));
 
-        for (Object obj : objects) {
-            result.append(CSV_LINE_SEPARATOR).append(createRowString(obj, fields));
-        }
+        objects.forEach(
+                obj -> result.append(CSV_LINE_SEPARATOR).append(createRowString(obj, fields))
+        );
+
         return result.toString();
     }
 
     /**
-     * Получает все поля класса. Пропускает отмеченные флагом ignore аннотации CsvField.
-     */
-    private List<Field> getFields(Class<?> clazz) {
-        return Arrays.stream(clazz.getDeclaredFields())
-                .filter(field -> !(field.isAnnotationPresent(CsvField.class) && field.getAnnotation(CsvField.class).ignore()))
-                .toList();
-    }
-
-    /**
      * Создание строки данных для одного объекта
+     *
+     * @param obj    объект для получения полей и сериализации
+     * @param fields список полей объекта для сериализации
      */
     private String createRowString(Object obj, List<Field> fields) {
         return fields.stream()
@@ -59,6 +54,17 @@ public class CsvSerializer {
                 .map(this::getValueAsString)
                 .map(this::escapeCsv)
                 .collect(Collectors.joining(CSV_COLUMN_SEPARATOR));
+    }
+
+    /**
+     * Получает все поля класса. Пропускает отмеченные флагом ignore аннотации CsvField
+     *
+     * @param clazz класс для получения полей
+     */
+    private List<Field> getFields(Class<?> clazz) {
+        return Arrays.stream(clazz.getDeclaredFields())
+                .filter(field -> !(field.isAnnotationPresent(CsvField.class) && field.getAnnotation(CsvField.class).ignore()))
+                .toList();
     }
 
     /**
