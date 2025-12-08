@@ -6,10 +6,16 @@ import org.writer.model.Person;
 import org.writer.model.Student;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Класс для запуска приложения
+ */
 public class Main {
+
+    /**
+     * Метод для запуска приложения
+     */
     public static void main(String[] args) {
         CsvSerializer serializer = new CsvSerializer();
         Writable csvWriter = new MyCsvWriter(serializer);
@@ -20,10 +26,13 @@ public class Main {
 
         testStudentsWithScores(csvWriter, faker);
 
-        testPersonWithSpecialSymbol(csvWriter, faker);
+        testPersonWithSpecialSymbol(csvWriter);
 
     }
 
+    /**
+     * Запись списка Person в файл
+     */
     private static void testPeople(Writable csvWriter, Faker faker) {
         List<Person> people = new ArrayList<>();
         for (int i = 0; i < 100; i++) {
@@ -31,14 +40,17 @@ public class Main {
                     .firstName(faker.name().firstName())
                     .lastName(faker.name().lastName())
                     .dayOfBirth(faker.number().numberBetween(1, 29))
-                    .monthOfBirth(Months.values()[faker.number().numberBetween(0,11)])
-                    .yearOfBirth(faker.number().numberBetween(1920,2015))
+                    .monthOfBirth(Months.values()[faker.number().numberBetween(0, 11)])
+                    .yearOfBirth(faker.number().numberBetween(1920, 2015))
                     .build());
         }
 
         csvWriter.writeToFile(people, "csv/people.csv");
     }
 
+    /**
+     * Запись Студентов со списком оценок
+     */
     private static void testStudentsWithScores(Writable csvWriter, Faker faker) {
         List<Student> students = new ArrayList<>();
 
@@ -51,6 +63,9 @@ public class Main {
         csvWriter.writeToFile(students, "csv/students.csv");
     }
 
+    /**
+     * Получения списка оценок для студента
+     */
     private static List<String> getStudentScores(Faker faker) {
         List<String> studentScores = new ArrayList<>();
         for (int i = 0; i < 20; i++) {
@@ -59,7 +74,10 @@ public class Main {
         return studentScores;
     }
 
-    private static void testPersonWithSpecialSymbol(Writable csvWriter, Faker faker) {
+    /**
+     * Тест запись Person со специальными символами в имени
+     */
+    private static void testPersonWithSpecialSymbol(Writable csvWriter) {
         Person PersonWithSpecialSymbol = Person.builder()
                 .firstName("Test, User")
                 .lastName("Special; Name,")
