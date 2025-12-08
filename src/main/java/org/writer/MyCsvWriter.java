@@ -3,10 +3,7 @@ package org.writer;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.*;
 import java.util.List;
 
 /**
@@ -17,6 +14,9 @@ public class MyCsvWriter implements Writable {
 
     private final CsvSerializer serializer;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void writeToFile(List<?> data, String fileName) {
         validateFileName(fileName);
@@ -41,13 +41,15 @@ public class MyCsvWriter implements Writable {
 
             System.out.println("Successfully wrote " + data.size() + " items to " + fileName);
 
-        } catch (IOException e) {
+        } catch (IOException | InvalidPathException e) {
             throw new RuntimeException("Failed to write CSV file: " + fileName, e);
         }
     }
 
     /**
      * Проверяет имя файла
+     *
+     * @param fileName имя файла для проверки
      */
     private void validateFileName(String fileName) {
         if (fileName == null) {
