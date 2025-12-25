@@ -1,0 +1,109 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'jacoco'
+    id 'org.sonarqube' version '4.4.1.3373'
+}
+
+group = 'org.writer'
+version = projectVersion
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+    withSourcesJar()
+    withJavadocJar()
+}
+
+jacoco {
+    toolVersion = "0.8.10"
+    reportsDirectory = layout.buildDirectory.dir('reports/jacoco')
+}
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+dependencies {
+    implementation "com.github.javafaker:javafaker:$fakerLibVersion"
+    testImplementation platform("org.junit:junit-bom:$jupiterPomVersion")
+    testImplementation "org.junit.jupiter:junit-jupiter"
+    testImplementation "org.mockito:mockito-core:$mockitoCoreVersion"
+}
+
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test
+
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = false
+
+        xml.outputLocation = layout.buildDirectory.file("reports/jacoco/test/jacocoTestReport.xml")
+        html.outputLocation = layout.buildDirectory.dir("reports/jacoco/test/html")
+    }
+
+    classDirectories.setFrom(files(
+            sourceSets.main.output.classesDirs.files.collect {
+                fileTree(dir: it, excludes: [
+                        '**/org/writer/util/GeneratorFakeData.class',
+                        '**/org/writer/util/GeneratorFakeData$*.class',
+                        '**/org/writer/exception/CsvWriterException.java'
+                ])
+            }
+    ))
+
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifactId = 'scv-writer'
+        }
+    }
+    repositories {
+        mavenLocal()
+    }
+}
+
+tasks.named('test') {
+    finalizedBy jacocoTestReport
+}
+
+tasks.named('jacocoTestReport') {
+    finalizedBy tasks.named('sonar')
+}
+
+tasks.named('build') {
+    dependsOn tasks.named('sonar')
+}
+
+tasks.named('sonar') {
+    mustRunAfter tasks.named('jacocoTestReport')
+}
+
+tasks.named('compileJava') {
+    finalizedBy tasks.named('sonar')
+}
+
+sonarqube {
+    properties {
+        property "sonar.gradle.skipCompile", "true"
+        property "sonar.coverage.exclusions",  ["**/org/writer/util/GeneratorFakeData.java",
+                                                "**/org/writer/exception/CsvWriterException.java"]
+
+    }
+}
