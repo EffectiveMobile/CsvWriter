@@ -3,6 +3,7 @@ package org.writer.model;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import org.writer.csv.annotation.CsvExclude;
 
 @Data
 @Builder
@@ -18,5 +19,8 @@ public class Person {
     private Months monthOfBirth;
 
     private int yearOfBirth;
+
+    @CsvExclude
+    private String passport;
 
 }
