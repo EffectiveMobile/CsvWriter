@@ -1,0 +1,40 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+}
+
+group = 'org.writer'
+version = '1.0.0'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+    withSourcesJar()
+    withJavadocJar()
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
+    testCompileOnly libs.lombok
+    testAnnotationProcessor libs.lombok
+    testImplementation libs.junit.jupiter
+}
+
+test {
+    useJUnitPlatform()
+}
+
+publishing {
+    publications {
+        create('mavenJava', MavenPublication) {
+            artifactId = 'csv-writer'
+            from components.java
+        }
+    }
+}

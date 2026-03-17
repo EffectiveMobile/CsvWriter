@@ -1,17 +1,17 @@
 package org.writer.model;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-
-import java.util.List;
+import org.writer.CsvColumn;
 
 @Data
-@Builder
 @AllArgsConstructor
-public class Student {
+public class TestDto {
 
+    @CsvColumn(name = "Name")
     private String name;
 
-    private List<String> score;
+    @CsvColumn(name = "Age")
+    private int age;
+
 }
