@@ -1,8 +1,8 @@
-package org.writer;
+package org.writer.csv;
 
 import java.util.List;
 
-public interface Writable {
+public interface Writable{
 
     void writeToFile(List<?> data, String fileName);
 
