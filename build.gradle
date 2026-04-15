@@ -1,0 +1,36 @@
+plugins {
+    id 'java'
+}
+
+group = 'org.writer'
+version = '1.0-SNAPSHOT'
+
+java {
+    sourceCompatibility = '17'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+tasks.withType(Test).configureEach {
+    systemProperty "file.encoding", "UTF-8"
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    annotationProcessor 'org.projectlombok:lombok:1.18.34'
+    compileOnly 'org.projectlombok:lombok:1.18.34'
+
+    testImplementation 'org.projectlombok:lombok:1.18.34'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
+    testImplementation 'net.datafaker:datafaker:2.0.2'
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
