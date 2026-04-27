@@ -6,7 +6,9 @@ group = 'org.writer'
 version = '1.0-SNAPSHOT'
 
 java {
-    sourceCompatibility = '17'
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -21,14 +23,14 @@ repositories {
 }
 
 dependencies {
-    annotationProcessor 'org.projectlombok:lombok:1.18.34'
-    compileOnly 'org.projectlombok:lombok:1.18.34'
+    annotationProcessor libs.lombok
+    compileOnly libs.lombok
 
-    testImplementation 'org.projectlombok:lombok:1.18.34'
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
+    testImplementation libs.lombok
+    testAnnotationProcessor libs.lombok
 
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
-    testImplementation 'net.datafaker:datafaker:2.0.2'
+    testImplementation libs.junit.jupiter
+    testImplementation libs.datafaker
 }
 
 tasks.test {
