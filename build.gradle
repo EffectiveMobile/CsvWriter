@@ -5,9 +5,14 @@ plugins {
 group = 'org.writer'
 version = '1.0-SNAPSHOT'
 
+
+
 java {
     sourceCompatibility = '17'
     targetCompatibility = '17'
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
 repositories {
@@ -15,12 +20,12 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'org.projectlombok:lombok:1.18.30'
-    annotationProcessor 'org.projectlombok:lombok:1.18.30'
-    testCompileOnly 'org.projectlombok:lombok:1.18.30'
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
-    testImplementation 'net.datafaker:datafaker:2.3.0'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
+    testCompileOnly libs.lombok
+    testAnnotationProcessor libs.lombok
+    testImplementation libs.datafaker
+    testImplementation libs.junit.jupiterl
 }
 
 test { useJUnitPlatform() }
