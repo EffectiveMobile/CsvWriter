@@ -13,8 +13,21 @@ import java.util.stream.Collectors;
 import org.writer.Writable;
 import org.writer.annotation.CsvWritable;
 
+/**
+ * {@code CsvWriter} provides implementation of {@code @Writeable} interface
+ * <p>
+ *   CsvWriter provides method to save data in CSV format using {@code CsvWritable} annotation marks
+ * </p>
+ */
 public class CsvWriter implements Writable {
 
+  /**
+   * Saves list of objects in CSV formatted file
+   * @param data list of values to be saved
+   * @param fileName path or name of file
+   * @throws IllegalArgumentException when list contains objects from different classes
+   * @throws RuntimeException when can not write to file or can not read object field
+   */
   @Override
   public void writeToFile(List<?> data, String fileName) {
     if (data == null || data.isEmpty()) {
