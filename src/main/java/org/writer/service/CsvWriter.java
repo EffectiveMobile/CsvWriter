@@ -69,7 +69,8 @@ public class CsvWriter implements Writable {
                 }
             ).collect(Collectors.joining("\n"));
     try {
-      Files.writeString(Path.of(fileName + ".csv"), result);
+      String filePath = fileName.concat(fileName.endsWith(".csv") ? "" : ".csv");
+      Files.writeString(Path.of(filePath), result);
     } catch (IOException e) {
       throw new RuntimeException("Failed to write CSV file: " + fileName, e);
     }
